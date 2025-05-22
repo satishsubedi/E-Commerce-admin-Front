@@ -17,10 +17,10 @@ A modern, responsive admin dashboard for managing e-commerce operations built wi
 
 - **Framework:** React 19
 - **Build Tool:** Vite 6
-- **Styling:** Tailwind CSS 4 and shadeCN UI
+- **Styling:** Tailwind CSS 4 
 - **UI Components:**
-  - Radix UI primitives
-  - Custom components with class-variance-authority
+  -shadeCN UI
+  
 - **Routing:** React Router DOM 7
 - **Icons:** Lucide React & React Icons
 - **Notifications:** React Toastify
