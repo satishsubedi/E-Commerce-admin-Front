@@ -17,7 +17,7 @@ A modern, responsive admin dashboard for managing e-commerce operations built wi
 
 - **Framework:** React 19
 - **Build Tool:** Vite 6
-- **Styling:** Tailwind CSS 4
+- **Styling:** Tailwind CSS 4 and shadeCN UI
 - **UI Components:**
   - Radix UI primitives
   - Custom components with class-variance-authority
@@ -31,7 +31,7 @@ A modern, responsive admin dashboard for managing e-commerce operations built wi
 1. Create a new Vite project:
 
 ```bash
-git clone <repo>
+git clone https://github.com/Mahesh0426/E-Commerce-admin-Front.git
 cd ecom-admin-fe
 ```
 
@@ -70,7 +70,7 @@ yarn add react-redux @reduxjs/toolkit
 yarn add axios
 ```
 
-5. Create a `.env` file in the root directory and add your environment variables:
+5. Create a `.env file in the root directory and add your environment variables:
 
 ```env
 VITE_API_URL=your_api_url
@@ -113,5 +113,9 @@ src/
 MIT Licenses
 
 ## 👥 Contributing
+Dinesh
+Sikher
+kovid
+Satish
+Mahesh
 
-[Add contribution guidelines here]
