@@ -113,9 +113,9 @@ src/
 MIT Licenses
 
 ## 👥 Contributing
-Dinesh
-Sikher
-kovid
-Satish
-Mahesh
+- Dinesh
+- Sikher
+- kovid
+- Satish
+- Mahesh
 
