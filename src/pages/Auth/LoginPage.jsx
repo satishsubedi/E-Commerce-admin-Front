@@ -1,5 +1,6 @@
 import { assets } from "../../assets/asset";
 import LoginForm from "../../components/log-in/LoginForm";
+import { Image } from "@/components/ui/image";
 
 export default function LoginPage() {
   return (
@@ -8,12 +9,11 @@ export default function LoginPage() {
       <LoginForm />
 
       {/* Right section (image) */}
-      <div className="hidden md:block relative">
-        <img
+      <div className="hidden md:block relative h-screen">
+        <Image
           src={assets.Auth}
           alt="Leaf Background"
-          fill
-          className="object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
     </div>

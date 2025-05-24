@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const handleOnChnage = (e, formData, setFormData) => {
+const handleOnChange = (e, formData, setFormData) => {
   const { name, value } = e.target;
 
   setFormData({
@@ -13,9 +13,10 @@ const useForm = (initialFormData) => {
   const [formData, setFormData] = useState(initialFormData);
 
   return {
-    handleOnChnage: (e) => handleOnChnage(e, formData, setFormData),
+    handleOnChange: (e) => handleOnChange(e, formData, setFormData),
     setFormData,
     formData,
   };
 };
+
 export default useForm;
