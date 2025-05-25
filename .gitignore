@@ -16,7 +16,14 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# macOS system files
 .DS_Store
+*.DS_Store
+**/.DS_Store
+**/._.DS_Store
+*.DS_Store?
+._.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
