@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-### Mahesh working on it
-
-### shekhar forked and testing
-=======
 # E-commerce Admin Frontend
 
 A modern, responsive admin dashboard for managing e-commerce operations built with React and Vite.
@@ -22,10 +17,9 @@ A modern, responsive admin dashboard for managing e-commerce operations built wi
 
 - **Framework:** React 19
 - **Build Tool:** Vite 6
-- **Styling:** Tailwind CSS 4 
+- **Styling:** Tailwind CSS 4
 - **UI Components:**
   -shadeCN UI
-  
 - **Routing:** React Router DOM 7
 - **Icons:** Lucide React & React Icons
 - **Notifications:** React Toastify
@@ -118,10 +112,9 @@ src/
 MIT Licenses
 
 ## 👥 Contributing
+
 - Dinesh
 - Sikher
 - kovid
 - Satish
 - Mahesh
-
->>>>>>> main

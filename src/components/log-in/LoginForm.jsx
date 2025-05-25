@@ -116,7 +116,7 @@ const LoginForm = () => {
         <p className="mt-8 text-center text-sm text-gray-500">
           Forgot password?
           <a
-            href="/forget-password"
+            href="/forgot-password"
             className="ml-1 text-sm text-blue-600 hover:underline"
           >
             Click here
