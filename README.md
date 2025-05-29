@@ -67,6 +67,10 @@ yarn add react-redux @reduxjs/toolkit
 
 # API handling
 yarn add axios
+
+# global state management
+yarn add react-redux
+yarn add @reduxjs/toolkit
 ```
 
 5. Create a `.env file in the root directory and add your environment variables:

@@ -1,5 +1,5 @@
 import { assets } from "../../assets/asset";
-import LoginForm from "../../components/log-in/LoginForm";
+import LoginForm from "../../components/auth/LoginForm";
 import { Image } from "@/components/ui/image";
 
 export default function LoginPage() {

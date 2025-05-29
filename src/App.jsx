@@ -3,7 +3,8 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import LoginPage from "./pages/Auth/LoginPage";
 import { ToastContainer } from "react-toastify";
-import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
+import ChangePasswordPage from "./pages/Auth/ChangePasswordPage";
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
       <Routes>
         {/* public Routes */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forget-password" element={<ForgotPasswordPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
 
         {/* private Routes */}
       </Routes>

@@ -1,9 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 import { Eye, EyeOff } from "lucide-react";
 import useForm from "../../hooks/useForm";
 import useLoading from "../../hooks/useLoading";
@@ -14,25 +11,44 @@ import {
 } from "../../config/formCongif";
 import FormControl from "../common-Input/FormControl";
 import { toast } from "react-toastify";
+import { getUserAction } from "../../redux/user/userAction";
+import { useDispatch } from "react-redux";
+import LoadingSpinner from "../helper/LoadingSpinner";
+import { Link } from "react-router-dom";
+import { loginUser } from "../../axios/userAxios";
 const LoginForm = () => {
-  //useform from custom hook
+  const dispatch = useDispatch();
+
   const { formData, handleOnChange, setFormData } =
-    useForm(initialLoginFormData);
-
-  //loading from custom hook
-  const { isLoading, startLoading, stopLoading } = useLoading();
-
-  //state
-  const [showPassword, setShowPassword] = useState(false);
+    useForm(initialLoginFormData); //useform from custom hook
+  const { isLoading, startLoading, stopLoading } = useLoading(); //loading from custom hook
+  const [showPassword, setShowPassword] = useState(false); //state
 
   // function handle form submit
   const handleOnSubmit = async (e) => {
     e.preventDefault();
-
     startLoading();
+
     try {
       //api call
-      alert("Login successful");
+      const response = await loginUser(formData);
+
+      if (response?.status === "error") {
+        toast.error(response.message || "Login failed. Please try again.");
+        return;
+      }
+
+      //store JTWs in session and local storage
+      sessionStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
+
+      //dispatch action to get user
+      dispatch(getUserAction());
+
+      toast.success(response.message || "Login successful!");
+
+      // Reset form data after successful login
+      setFormData(initialLoginFormData);
     } catch (error) {
       console.error("Login failed:", error);
       toast.error("Login failed. Please try again.");
@@ -57,7 +73,12 @@ const LoginForm = () => {
             <div key={index}>
               {field.name === "password" ? (
                 <div className="relative">
-                  <Label htmlFor={field.name}>{field.label}</Label>
+                  <Label
+                    className=" block font-bold mb-2  "
+                    htmlFor={field.name}
+                  >
+                    {field.label}
+                  </Label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
@@ -67,8 +88,8 @@ const LoginForm = () => {
                       placeholder={field.placeholder}
                       required
                       id={field.name}
-                      className="pr-10"
                       autoComplete="current-password"
+                      className=" dark:text-white mb-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 focus-visible:z-10 sm:text-sm/6"
                     />
                     <div
                       className="absolute inset-y-0 right-0 flex items-center pr-3 bg-transparent cursor-pointer"
@@ -105,9 +126,9 @@ const LoginForm = () => {
             <Button
               type="submit"
               className="w-full bg-green-800 hover:bg-green-900"
-              // disabled={isLoading}
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? <LoadingSpinner /> : "Login"}
             </Button>
           </div>
         </form>
@@ -115,37 +136,13 @@ const LoginForm = () => {
         {/* Forgot password */}
         <p className="mt-8 text-center text-sm text-gray-500">
           Forgot password?
-          <a
-            href="/forgot-password"
+          <Link
+            to="/forget-password"
             className="ml-1 text-sm text-blue-600 hover:underline"
           >
             Click here
-          </a>
+          </Link>
         </p>
-        {/* Divider */}
-        {/* <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
-          <span className="h-px bg-border flex-1" />
-          <span>Or</span>
-          <span className="h-px bg-border flex-1" />
-        </div> */}
-        {/* Social Login Buttons */}
-        {/* <div className="flex  items-center justify-center space-x-5">
-          <Button variant="outline" className="w-50 flex items-center gap-2">
-            <FcGoogle className="text-xl" />
-            Sign in with Google
-          </Button>
-          <Button variant="outline" className="w-50 flex items-center gap-2">
-            <FaApple className="text-xl" />
-            Sign in with Apple
-          </Button>
-        </div> */}
-        {/* Sign up link */}
-        {/* <p className="text-center text-sm">
-          Don’t have an account?{" "}
-          <a href="#" className="text-blue-600 hover:underline">
-            Sign Up
-          </a>
-        </p> */}
       </div>
     </div>
   );

@@ -35,3 +35,9 @@ export const ForgotPasswordFormControls = [
 export const initialForgotPasswordFormData = {
   userEmail: "",
 };
+
+//This is for change password
+export const initialChangePasswordFormData = {
+  password: "",
+  confirmPassword: "",
+};
