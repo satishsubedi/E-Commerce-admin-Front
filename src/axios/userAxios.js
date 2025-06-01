@@ -28,7 +28,7 @@ export const loginUser = (loginData) => {
 export const getUser = () => {
   return axiosApiCall({
     method: "get",
-    url: USER_API_URL,
+    url: `${USER_API_URL}/user-info`,
     isPrivate: true,
   });
 };
@@ -40,12 +40,20 @@ export const getUser = () => {
 // UPDATE USER | PATCH | PRIVATE
 
 //LOGOUT USER | POST | PRIVATE
+export const logoutUser = (email) => {
+  return axiosApiCall({
+    method: "post",
+    url: `${USER_API_URL}/logout`,
+    data: { email },
+    isPrivate: true,
+  });
+};
 
-//FORGET PASSWORD | /forgot-password | POST | PUBLIC
+//FORGET PASSWORD | /forget-password | POST | PUBLIC
 export const forgetPasswordEmail = (formData) => {
   return axiosApiCall({
     method: "post",
-    url: `${USER_API_URL}/forgot-password`,
+    url: `${USER_API_URL}/forget-password`,
     data: formData,
   });
 };

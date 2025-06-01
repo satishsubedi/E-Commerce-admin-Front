@@ -32,24 +32,21 @@ const ForgotPasswordPage = () => {
     startLoading();
     try {
       //api call
-      // const response = await forgetPasswordEmail(formData);
-      // if (response?.status === "error") {
-      //   toast.error(response.message || "Sending password reset link failed.");
-      //   return;
-      // }
+      const response = await forgetPasswordEmail(formData);
+      console.log("Sending Link response:", response);
 
-      // if (response?.status === "success") {
-      //   toast.success(
-      //     response.message || "Password reset link sent successfully."
-      //   );
-
-      //   setIsSuccess(true);
-
-      // }
-      setIsSuccess(true);
+      if (response?.status === "success") {
+        toast.success(response.message || " reset link sent successfully.");
+        setIsSuccess(true);
+      }
+      ``;
     } catch (error) {
       console.error("Sending Link failed failed:", error);
-      toast.error("Sending password reset link failed. Please try again.");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Sending password reset link failed. Please try again."
+      );
     } finally {
       stopLoading();
     }

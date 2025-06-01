@@ -13,8 +13,8 @@ export const axiosApiCall = async (axiosParams) => {
 
   // Determine the token based on whether to use refresh token or access token
   const token = useRefreshToken
-    ? localStorage.getItem("refreshToken")
-    : sessionStorage.getItem("accessToken");
+    ? localStorage.getItem("refreshJWT")
+    : sessionStorage.getItem("accessJWT");
 
   // Set headers based on whether the request is private or not
   const headers = { Authorization: isPrivate ? token : null };
@@ -49,6 +49,8 @@ export const axiosApiCall = async (axiosParams) => {
     //     message: error.message || "Something went wrong!",
     //   };
     // }
-    console.error(error || "An error occurred while making the API call");
+
+    console.error(error);
+    throw error;
   }
 };

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import useForm from "../../hooks/useForm";
 import useLoading from "../../hooks/useLoading";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   initialLoginFormData,
   LogInFormControls,
@@ -12,19 +12,21 @@ import {
 import FormControl from "../common-Input/FormControl";
 import { toast } from "react-toastify";
 import { getUserAction } from "../../redux/user/userAction";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingSpinner from "../helper/LoadingSpinner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../axios/userAxios";
+
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { formData, handleOnChange, setFormData } =
     useForm(initialLoginFormData); //useform from custom hook
   const { isLoading, startLoading, stopLoading } = useLoading(); //loading from custom hook
   const [showPassword, setShowPassword] = useState(false); //state
 
-  // function handle form submit
+  // Function to handle form submission
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     startLoading();
@@ -32,30 +34,46 @@ const LoginForm = () => {
     try {
       //api call
       const response = await loginUser(formData);
+      console.log("Login response:", response);
 
-      if (response?.status === "error") {
-        toast.error(response.message || "Login failed. Please try again.");
+      //destructure response
+      const { payload, message, status } = response;
+
+      // Check if the response is successful
+      if (status !== "success" || !payload) {
+        toast.error(message || "Invalid response from server.");
         return;
       }
 
-      //store JTWs in session and local storage
-      sessionStorage.setItem("accessToken", response.data.accessToken);
-      localStorage.setItem("refreshToken", response.data.refreshToken);
+      // Destructure accessJWT and refreshJWT from payload
+      const { accessJWT, refreshJWT } = payload;
 
-      //dispatch action to get user
+      // Store tokens
+      sessionStorage.setItem("accessJWT", accessJWT);
+      localStorage.setItem("refreshJWT", refreshJWT);
+
+      // Dispatch user fetch
       dispatch(getUserAction());
 
-      toast.success(response.message || "Login successful!");
-
-      // Reset form data after successful login
+      toast.success(response?.message || "Login successful!");
       setFormData(initialLoginFormData);
     } catch (error) {
-      console.error("Login failed:", error);
-      toast.error("Login failed. Please try again.");
+      console.error("Login failed.", error);
+      toast.error(error?.response?.data?.message || error?.message);
     } finally {
       stopLoading();
     }
   };
+
+  // Logic to handle what should happen if a user is logged in
+  const { user } = useSelector((state) => state.user);
+  console.log("user data", user.email);
+
+  useEffect(() => {
+    if (user?._id) {
+      navigate("/admin");
+    }
+  }, [user?._id, navigate]);
 
   return (
     <div className="flex flex-col justify-center px-10 md:px-20">
