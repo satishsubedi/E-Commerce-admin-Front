@@ -7,6 +7,8 @@ import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import ChangePasswordPage from "./pages/Auth/ChangePasswordPage";
 import AdminLayout from "./components/admin-layout/AdminLayout";
 
+import AddProduct from "./pages/AddProductPage";
+
 function App() {
   return (
     <>
@@ -16,8 +18,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/forget-password" element={<ForgotPasswordPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
-        <Route path="/change-password" element={<ChangePasswordPage />} />
-
+        <Route path="/addProduct" element={<AddProduct />} />
         {/* private Routes */}
         <Route path="/admin" element={<AdminLayout />} />
       </Routes>
