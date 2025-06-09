@@ -4,7 +4,7 @@ import { Image } from "@/components/ui/image";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-amber-100">
       {/* Left section (form) */}
       <LoginForm />
 
