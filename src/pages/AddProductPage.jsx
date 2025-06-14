@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-//This one is dinesh backend
+
 const API_BASE = "http://localhost:8000/api/v1/product";
 
 const AddProduct = () => {
@@ -16,79 +16,160 @@ const AddProduct = () => {
       price: 0,
       category: "",
       subcategory: "",
-      sizes: [{ size: "", stock: 0 }],
+      sizes: "",
       tags: "",
     },
   });
-  //This is for fetching the categories
+
+  // Fetch all categories on mount
   useEffect(() => {
     fetchCategories();
   }, []);
 
+  // Fetch categories from backend and reset subcategories & selections
   const fetchCategories = async () => {
-    const res = await axios.get(`${API_BASE}/getCategories`);
-    setCategories(res.data);
+    try {
+      const res = await axios.post(`${API_BASE}/getCategories`);
+      setCategories(res.data);
+      // Reset subcategories and product category/subcategory on refresh
+      setSubcategories([]);
+      setSelectedCategory("");
+      setFormData((prev) => ({
+        ...prev,
+        product: { ...prev.product, category: "", subcategory: "" },
+      }));
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    }
   };
-  //this is for subcategories
-  const fetchSubcategories = async (categoryId) => {
-    const res = await axios.get(`${API_BASE}/getSubCategories/${categoryId}`);
-    setSubcategories(res.data);
-  };
-  //This is for categories already exist
+
+  // When user selects a parent category
   const handleCategoryChange = (e) => {
     const id = e.target.value;
     setSelectedCategory(id);
-    setFormData({
-      ...formData,
-      product: { ...formData.product, category: id },
-    });
-    fetchSubcategories(id);
-  };
-  //this is for subcategories already exist
-  const handleSubcategoryChange = (e) => {
-    const id = e.target.value;
-    setFormData({
-      ...formData,
-      product: { ...formData.product, subcategory: id },
-    });
-  };
-  //This is for adding the product
-  const handleProductInput = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      product: {
-        ...formData.product,
-        [name]: value,
-      },
-    });
-  };
-  //This is for adding the new categories
-  const handleAddCategory = async () => {
-    await axios.post(`${API_BASE}/addCategory`, {
-      name: formData.categoryName,
-      slug: formData.categoryName.toLowerCase().replace(/ /g, "-"),
-    });
-    fetchCategories();
+
+    // Update product.category to the selected parent category
+    setFormData((prev) => ({
+      ...prev,
+      product: { ...prev.product, category: id, subcategory: "" }, // reset subcategory on category change
+    }));
+
+    // Filter subcategories whose parent matches selected category id
+    const filteredSubcategories = categories.filter(
+      (cat) => String(cat.parent) === id
+    );
+    setSubcategories(filteredSubcategories);
   };
 
-  //This is for adding the new subcategories
-  const handleAddSubcategory = async () => {
-    await axios.post(`${API_BASE}/addSubCategory`, {
-      name: formData.subcategoryName,
-      slug: formData.subcategoryName.toLowerCase().replace(/ /g, "-"),
-      parentCategory: selectedCategory,
-    });
-    fetchSubcategories(selectedCategory);
+  // When user selects a subcategory
+  const handleSubcategoryChange = (e) => {
+    const id = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      product: { ...prev.product, subcategory: id },
+    }));
   };
-  //This is for adding sizes as well
+
+  // Generic handler for other product input fields
+  const handleProductInput = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      product: {
+        ...prev.product,
+        [name]: value,
+      },
+    }));
+  };
+
+  // Add new category (root)
+  const handleAddCategory = async () => {
+    try {
+      await axios.post(`${API_BASE}/addCategory`, {
+        name: formData.categoryName,
+        slug: formData.categoryName.toLowerCase().replace(/ /g, "-"),
+      });
+      setFormData((prev) => ({ ...prev, categoryName: "" }));
+      fetchCategories();
+    } catch (err) {
+      console.error("Failed to add category", err);
+    }
+  };
+
+  // Add new subcategory under selected parent category
+  const handleAddSubcategory = async () => {
+    if (!selectedCategory) {
+      alert("Please select a parent category first.");
+      return;
+    }
+    try {
+      await axios.post(`${API_BASE}/addCategory`, {
+        name: formData.subcategoryName,
+        slug: formData.subcategoryName.toLowerCase().replace(/ /g, "-"),
+        parent: selectedCategory,
+      });
+      setFormData((prev) => ({ ...prev, subcategoryName: "" }));
+      fetchCategories();
+    } catch (err) {
+      console.error("Failed to add subcategory", err);
+    }
+  };
+
+  // Submit product creation
   const handleAddProduct = async () => {
     const { product } = formData;
-    await axios.post(`${API_BASE}/addProduct`, {
-      ...product,
-      sizes: product.sizes,
-      tags: product.tags.split(","),
-    });
+
+    // Determine categoryId: prefer subcategory if selected, else parent category
+    const categoryId = product.subcategory || product.category;
+
+    if (!categoryId) {
+      alert("Please select a category or subcategory for the product.");
+      return;
+    }
+
+    // Find the selected category or subcategory object to get path
+    const selectedCatObj = categories.find((cat) => cat._id === categoryId);
+    if (!selectedCatObj) {
+      alert("Selected category not found. Please try again.");
+      return;
+    }
+
+    try {
+      await axios.post(`${API_BASE}/addProduct`, {
+        ...product,
+        tags: product.tags
+          ? product.tags.split(",").map((tag) => tag.trim())
+          : [],
+        sizes: product.sizes
+          ? product.sizes.split(",").map((size) => size.trim())
+          : [],
+        categoryId: categoryId,
+        categoryPath: selectedCatObj.path,
+      });
+
+      alert("Product added successfully!");
+
+      // Reset product form (optional)
+      setFormData((prev) => ({
+        ...prev,
+        product: {
+          title: "",
+          description: "",
+          price: 0,
+          category: "",
+          subcategory: "",
+          sizes: "",
+          tags: "",
+        },
+      }));
+
+      // Reset selections and subcategories
+      setSelectedCategory("");
+      setSubcategories([]);
+    } catch (err) {
+      console.error("Failed to add product", err);
+      alert("Failed to add product. Check console for details.");
+    }
   };
 
   return (
@@ -108,11 +189,11 @@ const AddProduct = () => {
             onChange={(e) =>
               setFormData({ ...formData, categoryName: e.target.value })
             }
-            className="flex-grow border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-grow border border-gray-300 rounded-md px-4 py-2"
           />
           <button
             onClick={handleAddCategory}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md px-6 py-2 transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2"
           >
             Add Category
           </button>
@@ -122,18 +203,20 @@ const AddProduct = () => {
       {/* Add Subcategory */}
       <section className="space-y-4">
         <h3 className="text-xl font-semibold text-gray-700">Add Subcategory</h3>
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="flex gap-4">
           <select
             onChange={handleCategoryChange}
             value={selectedCategory}
-            className="flex-grow border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="flex-grow border border-gray-300 rounded-md px-4 py-2"
           >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.name}
-              </option>
-            ))}
+            <option value="">Select Parent Category</option>
+            {categories
+              .filter((cat) => !cat.parent)
+              .map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
           <input
             type="text"
@@ -142,11 +225,11 @@ const AddProduct = () => {
             onChange={(e) =>
               setFormData({ ...formData, subcategoryName: e.target.value })
             }
-            className="flex-grow border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="flex-grow border border-gray-300 rounded-md px-4 py-2"
           />
           <button
             onClick={handleAddSubcategory}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-md px-6 py-2 transition"
+            className="bg-green-600 hover:bg-green-700 text-white rounded-md px-6 py-2"
           >
             Add Subcategory
           </button>
@@ -160,44 +243,57 @@ const AddProduct = () => {
           <input
             name="title"
             placeholder="Product Title"
+            value={formData.product.title}
             onChange={handleProductInput}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
           />
           <input
             name="description"
             placeholder="Product Description"
+            value={formData.product.description}
             onChange={handleProductInput}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
           />
           <input
             name="price"
             type="number"
             placeholder="Price"
+            value={formData.product.price}
             onChange={handleProductInput}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
+          />
+          <input
+            name="sizes"
+            placeholder="Sizes (comma-separated)"
+            value={formData.product.sizes}
+            onChange={handleProductInput}
+            className="border border-gray-300 rounded-md px-4 py-2"
           />
           <input
             name="tags"
             placeholder="Tags (comma-separated)"
+            value={formData.product.tags}
             onChange={handleProductInput}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
           />
           <select
             onChange={handleCategoryChange}
             value={formData.product.category}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
           >
             <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.name}
-              </option>
-            ))}
+            {categories
+              .filter((cat) => !cat.parent)
+              .map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
           <select
             onChange={handleSubcategoryChange}
             value={formData.product.subcategory}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="border border-gray-300 rounded-md px-4 py-2"
           >
             <option value="">Select Subcategory</option>
             {subcategories.map((sub) => (
@@ -207,15 +303,12 @@ const AddProduct = () => {
             ))}
           </select>
         </div>
-
-        <div>
-          <button
-            onClick={handleAddProduct}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md px-8 py-3 w-full md:w-auto transition"
-          >
-            Add Product
-          </button>
-        </div>
+        <button
+          onClick={handleAddProduct}
+          className="bg-purple-600 hover:bg-purple-700 text-white rounded-md px-8 py-3 w-full md:w-auto"
+        >
+          Add Product
+        </button>
       </section>
     </div>
   );
