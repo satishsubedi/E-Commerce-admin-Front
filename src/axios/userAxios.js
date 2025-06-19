@@ -20,7 +20,6 @@ export const loginUser = (loginData) => {
   return axiosApiCall({
     method: "post",
     url: `${USER_API_URL}/login`,
-    data: loginData,
   });
 };
 
@@ -29,7 +28,6 @@ export const getUser = () => {
   return axiosApiCall({
     method: "get",
     url: `${USER_API_URL}/user-info`,
-    isPrivate: true,
   });
 };
 

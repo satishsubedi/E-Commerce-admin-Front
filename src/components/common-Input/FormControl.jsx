@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -17,7 +17,7 @@ const FormControl = (props) => {
   //use when we need to select a value from a list
   if (inputAttributes.type === "select") {
     return (
-      <div className="mb-4">
+      <div className="mb-3">
         <Label htmlFor={inputAttributes.id} className="block font-bold mb-2">
           {label}
         </Label>
@@ -28,7 +28,7 @@ const FormControl = (props) => {
           }
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={inputAttributes.name} />
+            <SelectValue placeholder={inputAttributes.placeholder || ""} />
           </SelectTrigger>
           <SelectContent>
             {options.map((option, index) => (
@@ -45,7 +45,7 @@ const FormControl = (props) => {
   //use when we need to enter a long text
   if (inputAttributes.type === "textarea") {
     return (
-      <div className="mb-4">
+      <div className="mb-6 col-span-full">
         <Label htmlFor={inputAttributes.id} className="block font-bold mb-2">
           {label}
         </Label>
@@ -53,8 +53,43 @@ const FormControl = (props) => {
           {...inputAttributes}
           value={inputAttributes.value || ""}
           onChange={(e) => handleOnChange(e)}
-          className="w-full p-2 border rounded-md"
+          className="w-full p-3 border rounded-sm shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
         />
+      </div>
+    );
+  }
+
+  // when input attribute is file
+  if (inputAttributes.type === "file") {
+    // const handleFileChange = (e) => {
+    //    const files = Array.from(e.target.files);
+    //    setSelectedFiles(files);
+    //   handleOnChange(e);
+    // }
+    const { value, ...fileInputAttributes } = inputAttributes;
+
+    const files = inputAttributes.value || [];
+
+    return (
+      <div className="mb-6 col-span-full">
+        <Label htmlFor={inputAttributes.id} className="block font-bold mb-2">
+          {label}
+        </Label>
+        <div className="space-y-2">
+          <Input
+            {...fileInputAttributes}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleOnChange}
+            className="w-full h-10  border-0 rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          {files.length > 0 && (
+            <p className="text-sm text-gray-500">
+              {files.length} file(s) selected
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -73,7 +108,10 @@ const FormControl = (props) => {
         {...inputAttributes}
         value={inputAttributes.value || ""}
         onChange={(e) => handleOnChange(e)}
-        className=" dark:text-white mb-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 focus-visible:z-10 sm:text-sm/6"
+        className=" dark:text-white mb-2 block w-full rounded-lg border-0 px-3 py-2
+         text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset 
+        focus-visible:ring-green-600 focus-visible:z-10 sm:text-sm/6"
       />
     </div>
   );
