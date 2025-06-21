@@ -4,26 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "react-toastify";
 import RecursiveCategory from "../../components/category/RecursiveCategory";
-import { addCategory } from "../../axios/categoryAxios";
+import CategoryForm from "../../components/category/CategoryForm";
 import { useDispatch, useSelector } from "react-redux";
-import { getCategoryAction } from "../../redux/category/categoryAction";
-import { closeForm, showEditForm } from "../../redux/category/categorySlice";
+import {
+  getCategoryAction,
+  addCategoryAction,
+  updateCategoryAction,
+} from "../../redux/category/categoryAction";
+import useForm from "../../hooks/useForm";
+import { initialCategoryState } from "../../config/formCongif";
 
 const CategoryPage = () => {
   const dispatch = useDispatch();
 
   // Local state
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [newCategory, setNewCategory] = useState({
-    name: "",
-    parentId: null,
-    showForm: false,
-  });
-
+  const { formData, handleOnChange, setFormData } =
+    useForm(initialCategoryState);
   // redux store
   const { categories } = useSelector((state) => state.category);
-  // console.log("categories", categories);
 
+  // Fetch categories on component mount
   useEffect(() => {
     dispatch(getCategoryAction());
   }, [dispatch]);
@@ -36,27 +37,27 @@ const CategoryPage = () => {
     }));
   };
 
-  // Handle adding a new category
+  // Handle adding/editing a category using Redux actions
   const handleAddCategory = async () => {
-    if (!newCategory.name) return toast("Category name is required");
+    if (!formData.name) return toast("Category name is required");
 
     try {
-      // api call
-      const response = await addCategory({
-        name: newCategory.name,
-        slug: newCategory.name.toLowerCase().replace(/ /g, "-"),
-        parent: newCategory.parentId || null,
-      });
+      const categoryData = {
+        name: formData?.name,
+        slug: formData?.name.toLowerCase().replace(/ /g, "-"),
+        parent: formData?.parentId || null,
+      };
 
-      if (response.success || response.status === "success") {
-        toast.success(`"${newCategory.name}" category added successfully!`, {});
-      }
-      dispatch(getCategoryAction()); // Refresh categories from Redux
+      // Dispatch addCategoryAction or updateCategoryAction
+      formData?.id
+        ? dispatch(updateCategoryAction(formData.id, categoryData))
+        : dispatch(addCategoryAction(categoryData));
 
-      setNewCategory({ name: "", parentId: null, showForm: false }); // Reset form
+      // Reset form after dispatching action
+      setFormData(initialCategoryState);
     } catch (err) {
-      console.error("Failed to add category", err);
-      toast.error("Failed to add category");
+      console.error("Failed to save category", err);
+      toast.error("Failed to save category");
     }
   };
 
@@ -87,11 +88,7 @@ const CategoryPage = () => {
         <Button
           className="bg-blue-600 hover:bg-blue-700 mr-7"
           onClick={() =>
-            setNewCategory({
-              name: "",
-              parentId: null,
-              showForm: true,
-            })
+            setFormData({ name: "", parentId: null, showForm: true })
           }
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -99,42 +96,16 @@ const CategoryPage = () => {
         </Button>
       </div>
 
-      {/* Add Root Category Form */}
-      {newCategory.parentId === null && newCategory.showForm && (
+      {/* Add/Edit Category Form */}
+      {formData.showForm && formData.parentId === null && (
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                placeholder="New root category name"
-                className="border rounded-md px-3 py-2 flex-1"
-                value={newCategory.name}
-                onChange={(e) =>
-                  setNewCategory((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-              />
-              <Button
-                onClick={handleAddCategory}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Add
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setNewCategory({
-                    name: "",
-                    parentId: null,
-                    showForm: false,
-                  })
-                }
-              >
-                Cancel
-              </Button>
-            </div>
+            <CategoryForm
+              formData={formData}
+              setFormData={setFormData}
+              handleOnChange={handleOnChange}
+              handleAddCategory={handleAddCategory}
+            />
           </CardContent>
         </Card>
       )}
@@ -154,9 +125,10 @@ const CategoryPage = () => {
               category={category}
               level={1}
               expandedCategories={expandedCategories}
-              newCategory={newCategory}
+              formData={formData}
+              setFormData={setFormData}
+              handleOnChange={handleOnChange}
               toggleCategory={toggleCategory}
-              setNewCategory={setNewCategory}
               handleAddCategory={handleAddCategory}
               onDeleteCategory={handleDeleteCategory}
             />
@@ -166,4 +138,5 @@ const CategoryPage = () => {
     </div>
   );
 };
+
 export default CategoryPage;

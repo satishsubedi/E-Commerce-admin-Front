@@ -10,25 +10,29 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import CategoryForm from "./CategoryForm";
 
 const RecursiveCategory = (props) => {
+  // Destructuring props
   const {
     category,
     level = 1,
     expandedCategories,
-    newCategory,
+    formData,
     toggleCategory,
-    setNewCategory,
+    setFormData,
     handleAddCategory,
     onDeleteCategory,
+    handleOnChange,
   } = props;
+
   const isExpanded = expandedCategories[category._id] || false;
   const hasChildren = category.children?.length > 0;
 
   return (
     <div className="space-y-2">
+      {/* Category card */}
       <div
-        /* Category card */
         className={`flex items-center justify-between p-4 rounded-lg border-2 mb-3 ${
           level === 1
             ? "bg-blue-50 border-blue-200 text-blue-900"
@@ -82,7 +86,7 @@ const RecursiveCategory = (props) => {
             size="sm"
             className="h-8"
             onClick={() =>
-              setNewCategory({
+              setFormData({
                 name: "",
                 parentId: category._id,
                 showForm: true,
@@ -92,7 +96,19 @@ const RecursiveCategory = (props) => {
             <Plus className="h-3 w-3 mr-1" />
             Add Sub
           </Button>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8"
+            onClick={() =>
+              setFormData({
+                id: category._id,
+                name: category.name,
+                parentId: category.parent || null,
+                showForm: true,
+              })
+            }
+          >
             <Edit className="h-3 w-3" />
           </Button>
           <Button
@@ -105,47 +121,15 @@ const RecursiveCategory = (props) => {
           </Button>
         </div>
       </div>
-
-      {/* Add Subcategory Form */}
-      {newCategory.parentId === category._id && newCategory.showForm && (
-        <div className="ml-6 mb-4 p-4 bg-gray-50 rounded-lg border">
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              placeholder="New category name"
-              className="border rounded-md px-3 py-1 flex-1"
-              value={newCategory.name}
-              onChange={(e) =>
-                setNewCategory((prev) => ({
-                  ...prev,
-                  name: e.target.value,
-                }))
-              }
-            />
-            <Button
-              size="sm"
-              onClick={handleAddCategory}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Add
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setNewCategory({
-                  name: "",
-                  parentId: null,
-                  showForm: false,
-                })
-              }
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
+      {/* Add/Edit Subcategory Form */}
+      {formData.parentId === category._id && formData.showForm && (
+        <CategoryForm
+          formData={formData}
+          setFormData={setFormData}
+          handleOnChange={handleOnChange}
+          handleAddCategory={handleAddCategory}
+        />
       )}
-
       {/* Render children if expanded */}
       {isExpanded && hasChildren && (
         <div className="ml-6">
@@ -155,9 +139,10 @@ const RecursiveCategory = (props) => {
               category={child}
               level={level + 1}
               expandedCategories={expandedCategories}
-              newCategory={newCategory}
+              formData={formData}
+              setFormData={setFormData}
+              handleOnChange={handleOnChange}
               toggleCategory={toggleCategory}
-              setNewCategory={setNewCategory}
               handleAddCategory={handleAddCategory}
               onDeleteCategory={onDeleteCategory}
             />

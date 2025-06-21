@@ -150,3 +150,11 @@ export const ProductFormControls = [
     ],
   },
 ];
+
+//this is for category form
+export const initialCategoryState = {
+  id: null,
+  name: "",
+  parentId: null,
+  showForm: false,
+};

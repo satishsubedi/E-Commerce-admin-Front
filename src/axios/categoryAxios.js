@@ -31,11 +31,11 @@ export const deleteCategory = (categoryId) => {
 };
 
 // UPDATE a category | PATCH | PRIVATE
-export const updateCategory = (categoryId, category) => {
+export const updateCategory = (categoryId, categoryobj) => {
   return axiosApiCall({
     method: "patch",
     url: `${USER_API_URL}/product/category/${categoryId}`,
-    data: category,
+    data: categoryobj,
     isPrivate: true,
   });
 };

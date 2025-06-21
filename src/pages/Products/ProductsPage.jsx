@@ -19,9 +19,7 @@ const ProductsPage = () => {
   const { formData, handleOnChange, setFormData } = useForm(
     initialProductFormData
   );
-
   const { isLoading, startLoading, stopLoading } = useLoading();
-
   // redux store
   const { categories } = useSelector((state) => state.category);
   // console.log("categories", categories);
@@ -32,17 +30,38 @@ const ProductsPage = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    const { tags = "", sizes = "", colors = "" } = formData;
+
+    //validation
+    if (
+      !formData.title ||
+      !formData.categoryId ||
+      !formData.description ||
+      !formData.price ||
+      !formData.stock ||
+      !formData.status
+    ) {
+      toast(" All  fields required ");
+      return;
+    }
+
+    if (
+      formData.price < 0 ||
+      formData.stock < 0 ||
+      formData.discountPrice < 0
+    ) {
+      toast("Price, stock, and discount price cannot be negative");
+      return;
+    }
+
     try {
       startLoading();
       const response = await addProduct({
         ...formData,
-        tags: tags.split(",").map((t) => t.trim()),
-        sizes: sizes.split(",").map((s) => s.trim()),
-        colors: colors.split(",").map((c) => c.trim()),
+        tags: formData.split(",").map((t) => t.trim()),
+        sizes: formData.split(",").map((s) => s.trim()),
+        colors: formData.split(",").map((c) => c.trim()),
       });
-
-      console.log("Add Product Response:", response);
+      // console.log("Add Product Response:", response);
 
       if (response) {
         toast.success(response.message || "Product added successfully!");
