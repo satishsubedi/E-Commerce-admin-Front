@@ -1,195 +1,354 @@
-import { FileText, Package, Save } from "lucide-react";
-import useForm from "../../hooks/useForm";
-import useLoading from "../../hooks/useLoading";
+import React, { useState, useEffect } from "react";
+import { Plus, Package, Edit, Trash2, Eye, X } from "lucide-react";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
 import {
-  initialProductFormData,
-  ProductFormControls,
-} from "../../config/formCongif";
-import { useEffect } from "react";
-import { getCategoryAction } from "../../redux/category/categoryAction";
-import { useDispatch, useSelector } from "react-redux";
-import { addProduct } from "../../axios/productAxios";
-import { toast } from "react-toastify";
-import FormControl from "../../components/common-Input/FormControl";
-import LoadingSpinner from "../../components/helper/LoadingSpinner";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import ProductForm from "../../components/product/ProductForm";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllProductsAction } from "../../redux/product/productAction";
+import useForm from "../../hooks/useForm";
+import { initialProductFormData } from "../../config/formCongif";
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
+  // Use form data directly instead of separate editProduct state
   const { formData, handleOnChange, setFormData } = useForm(
     initialProductFormData
   );
-  const { isLoading, startLoading, stopLoading } = useLoading();
-  // redux store
-  const { categories } = useSelector((state) => state.category);
-  // console.log("categories", categories);
 
+  // redux store
+  const { products } = useSelector((state) => state.product);
+  console.log("products", products);
+
+  // Fetch products on component mount
   useEffect(() => {
-    dispatch(getCategoryAction());
+    dispatch(getAllProductsAction());
   }, [dispatch]);
 
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-
-    //validation
-    if (
-      !formData.title ||
-      !formData.categoryId ||
-      !formData.description ||
-      !formData.price ||
-      !formData.stock ||
-      !formData.status
-    ) {
-      toast(" All  fields required ");
-      return;
-    }
-
-    if (
-      formData.price < 0 ||
-      formData.stock < 0 ||
-      formData.discountPrice < 0
-    ) {
-      toast("Price, stock, and discount price cannot be negative");
-      return;
-    }
-
-    try {
-      startLoading();
-      const response = await addProduct({
-        ...formData,
-        tags: formData.split(",").map((t) => t.trim()),
-        sizes: formData.split(",").map((s) => s.trim()),
-        colors: formData.split(",").map((c) => c.trim()),
-      });
-      // console.log("Add Product Response:", response);
-
-      if (response) {
-        toast.success(response.message || "Product added successfully!");
-      }
-      setFormData(initialProductFormData);
-    } catch (err) {
-      console.error("Failed to add product", err);
-      toast.error(err.response?.data?.message || "Failed to add product");
-    } finally {
-      stopLoading();
-    }
+  const getStatusBadge = (status) => {
+    return status === "active" ? (
+      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+        Active
+      </Badge>
+    ) : (
+      <Badge variant="secondary">Inactive</Badge>
+    );
   };
 
-  // Recursive function to show nested categories with indent
-  const renderCategoryOptions = (categories, depth = 0) => {
-    let options = [];
-    categories.forEach((cat) => {
-      options.push({
-        value: cat._id,
-        label: `${Array(depth).fill("\u00A0\u00A0\u00A0").join("")}${cat.name}`,
-      });
-      if (cat.children?.length > 0) {
-        options = options.concat(
-          renderCategoryOptions(cat.children, depth + 1)
-        );
-      }
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
-    return options;
   };
 
-  // const getCategoryPath = (categoryId) => {
-  //   // Flatten the tree for lookup
-  //   const flatten = (cats) =>
-  //     cats.reduce(
-  //       (acc, cat) => [
-  //         ...acc,
-  //         cat,
-  //         ...(cat.children ? flatten(cat.children) : []),
-  //       ],
-  //       []
-  //     );
-  //   const allCategories = flatten(categories);
+  const handleFormClose = () => {
+    setShowCreateForm(false);
+    setFormData(initialProductFormData);
+  };
 
-  //   let path = [];
-  //   let current = allCategories.find((cat) => cat._id === categoryId);
-  //   while (current) {
-  //     path.unshift(current.name);
-  //     current = allCategories.find((cat) => cat._id === current.parent);
-  //   }
-  //   return path.join(" → ");
-  // };
+  const handleEditProduct = (product) => {
+    // Create properly structured product data for editing
+    const productData = {
+      _id: product?._id,
+      title: product?.title,
+      slug: product?.slug,
+      description: product?.description,
+      price: product?.price,
+      discountPrice: product?.discountPrice,
+      stock: product?.stock,
+      brand: product?.brand,
+      categoryId: product?.categoryId,
+      categoryPath: product?.categoryPath,
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-6  ">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-6 py-4 border-b ">
-            <div className="flex items-center gap-3">
-              <Package className="w-6 h-6 text-blue-600" />
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Create New Product
-              </h1>
+      tags: Array.isArray(product?.tags)
+        ? product.tags.join(", ")
+        : product?.tags || "",
+      sizes: Array.isArray(product?.sizes)
+        ? product.sizes.join(", ")
+        : product?.sizes || "",
+      colors: Array.isArray(product?.colors)
+        ? product.colors.join(", ")
+        : product?.colors || "",
+      images: product?.images || [],
+      thumbnail: product?.thumbnail,
+      ratings: product?.ratings || 0,
+      status: product?.status || "active",
+      showForm: true,
+    };
+
+    setFormData(productData);
+    setShowCreateForm(true);
+  };
+
+  const handleCreateProduct = () => {
+    setFormData(initialProductFormData);
+    setShowCreateForm(true);
+  };
+
+  // If form is shown, render the form page
+  if (showCreateForm) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Package className="w-6 h-6 text-blue-600" />
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    {formData._id ? "Edit Product" : "Create New Product"}
+                  </h1>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleFormClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <ProductForm
+                handleFormClose={handleFormClose}
+                formData={formData}
+                setFormData={setFormData}
+                handleOnChange={handleOnChange}
+              />
             </div>
           </div>
-
-          <div className="p-6 space-y-8">
-            {/* <div className="space-y-6"> */}
-            <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Basic Information
-            </h2>
-
-            <form
-              onSubmit={handleAddProduct}
-              className="space-y-4"
-              autoComplete="on"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {ProductFormControls.map((field, index) => (
-                  <div
-                    key={index}
-                    className={field.type === "textarea" ? "col-span-full" : ""}
-                  >
-                    <FormControl
-                      label={field.label}
-                      handleOnChange={handleOnChange}
-                      inputAttributes={{
-                        type: field.type,
-                        name: field.name,
-                        value: formData[field.name],
-                        placeholder: field.placeholder,
-                        autoComplete: field.autoComplete,
-                        id: field.name,
-                      }}
-                      options={
-                        field.name === "categoryId"
-                          ? renderCategoryOptions(categories)
-                          : field.options
-                      }
-                    />
-
-                    {/* Category Path Display */}
-                    {/* {field.name === "categoryId" && formData.categoryId && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-2">
-                        <p className="text-sm text-blue-800">
-                          <span className="font-medium">Category Path:</span>{" "}
-                          {getCategoryPath(formData.categoryId)}
-                        </p>
-                      </div>
-                    )} */}
-                  </div>
-                ))}
-              </div>
-              {/* Submit Button */}
-              <div className="flex justify-end pt-6 border-t border-gray-200">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 font-medium"
-                >
-                  <Save className="w-4 h-4" />
-                  {isLoading ? <LoadingSpinner /> : "Create Product"}
-                </button>
-              </div>
-            </form>
-            {/* </div> */}
-          </div>
         </div>
+      </div>
+    );
+  }
+
+  // Main products list view
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Package className="w-8 h-8 text-blue-600" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+              <p className="text-gray-600">Manage your product inventory</p>
+            </div>
+          </div>
+          <Button
+            onClick={handleCreateProduct}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Product
+          </Button>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Products
+              </CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{products?.length || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                {products?.length > 0
+                  ? `+${products.length} products`
+                  : "No products yet"}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Active Products
+              </CardTitle>
+              <Badge className="bg-green-100 text-green-800">Active</Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {products?.filter((p) => p.status === "active").length || 0}
+              </div>
+              <p className="text-xs text-muted-foreground">Active products</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Stock</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {products?.reduce(
+                  (sum, product) => sum + (product.stock || 0),
+                  0
+                ) || 0}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Units in inventory
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+              <span className="text-sm font-medium">$</span>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatPrice(
+                  products?.reduce(
+                    (sum, product) =>
+                      sum + (product.price || 0) * (product.stock || 0),
+                    0
+                  ) || 0
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">Inventory value</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Products Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Product List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {products && products.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Brand</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {products.map((product) => (
+                    <TableRow key={product._id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={
+                              product.thumbnail ||
+                              "https://via.placeholder.com/40x40?text=No+Image"
+                            }
+                            alt={product.title}
+                            className="w-10 h-10 rounded-lg object-cover"
+                          />
+                          <div>
+                            <div className="font-medium">{product.title}</div>
+                            <div className="text-sm text-gray-500 truncate max-w-[200px]">
+                              {product.description}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {product.categoryPath || "Uncategorized"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatPrice(product.price)}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`font-medium ${
+                            (product.stock || 0) < 10
+                              ? "text-red-600"
+                              : (product.stock || 0) < 50
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {product.stock || 0}
+                        </span>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(product.status)}</TableCell>
+                      <TableCell>{product.brand || "N/A"}</TableCell>
+                      <TableCell>{formatDate(product.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8">
+                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No products yet
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  Get started by creating your first product.
+                </p>
+                <Button
+                  onClick={handleCreateProduct}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Your First Product
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

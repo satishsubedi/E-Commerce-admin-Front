@@ -5,18 +5,18 @@ import {
   getCategoryTree,
   updateCategory,
 } from "../../axios/categoryAxios";
+import { axiosApiCall } from "../../axios/axiosApiCall";
 
 //Redux Thunk
 //Get Category Action
 export const getCategoryAction = () => async (dispatch) => {
   const response = await getCategoryTree();
-  //   console.log("Category Tree:", response);
 
   if (response?.status == "error") {
     return toast.error(response.message || "Something went wrong!");
   }
   // If the response is successful, dispatch the setcategories action with the category data
-  dispatch(setCategories(response.data));
+  dispatch(setCategories(response.payload));
 
   return response;
 };
@@ -25,10 +25,9 @@ export const getCategoryAction = () => async (dispatch) => {
 export const addCategoryAction = (categoryData) => async (dispatch) => {
   try {
     const response = await addCategory(categoryData);
-    // console.log("categoryData", categoryData);
 
     if (response.success || response.status === "success") {
-      toast.success(`${categoryData.name} Category added successfully!`);
+      toast.success(response.message || ` Category added successfully!`);
 
       //  again fetch getCategoryAction to get updated categories
       dispatch(getCategoryAction());

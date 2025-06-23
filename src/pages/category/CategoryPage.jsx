@@ -23,6 +23,7 @@ const CategoryPage = () => {
     useForm(initialCategoryState);
   // redux store
   const { categories } = useSelector((state) => state.category);
+  // console.log("categories", categories);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -49,8 +50,8 @@ const CategoryPage = () => {
       };
 
       // Dispatch addCategoryAction or updateCategoryAction
-      formData?.id
-        ? dispatch(updateCategoryAction(formData.id, categoryData))
+      formData?._id
+        ? dispatch(updateCategoryAction(formData._id, categoryData))
         : dispatch(addCategoryAction(categoryData));
 
       // Reset form after dispatching action

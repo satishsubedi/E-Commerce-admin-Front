@@ -29,6 +29,14 @@ const RecursiveCategory = (props) => {
   const isExpanded = expandedCategories[category._id] || false;
   const hasChildren = category.children?.length > 0;
 
+  //destructure category
+  const categoryData = {
+    _id: category._id,
+    name: category.name,
+    parentId: category.parent || null,
+    showForm: true,
+  };
+
   return (
     <div className="space-y-2">
       {/* Category card */}
@@ -100,14 +108,7 @@ const RecursiveCategory = (props) => {
             variant="outline"
             size="sm"
             className="h-8"
-            onClick={() =>
-              setFormData({
-                id: category._id,
-                name: category.name,
-                parentId: category.parent || null,
-                showForm: true,
-              })
-            }
+            onClick={() => setFormData(categoryData)}
           >
             <Edit className="h-3 w-3" />
           </Button>

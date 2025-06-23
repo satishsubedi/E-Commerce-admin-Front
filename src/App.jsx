@@ -15,6 +15,8 @@ import OrdersPage from "./pages/Orders/OrdersPage";
 import CategoryPage from "./pages/category/CategoryPage";
 
 import AddProduct from "./pages/AddProductPage";
+import CreateProductPage from "./pages/Products/CreateProductPage";
+import EditProductPage from "./pages/Products/EditProductPage";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="create-product" element={<CreateProductPage />} />
+          <Route path="edit-product/:id" element={<EditProductPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="coupons" element={<CouponsPage />} />
           <Route path="settings" element={<SettingPage />} />
