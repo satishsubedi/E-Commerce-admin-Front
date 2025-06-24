@@ -46,6 +46,9 @@ const CategoryPage = () => {
       const categoryData = {
         name: formData?.name,
         slug: formData?.name.toLowerCase().replace(/ /g, "-"),
+        description: formData?.description || "",
+        brand: formData?.brand || "",
+        tags: formData?.tags || "",
         parent: formData?.parentId || null,
       };
 

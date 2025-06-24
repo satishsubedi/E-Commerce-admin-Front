@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { setProduct, setProducts } from "./productSlice";
+import { setIsLoading, setProduct, setProducts } from "./productSlice";
 import {
   addProduct,
   deleteProduct,
@@ -11,17 +11,27 @@ import {
 //Redux Thunk
 //Get all the  Product Action
 export const getAllProductsAction = () => async (dispatch) => {
-  const response = await getAllProducts();
-  //   console.log("response:", response);
+  try {
+    dispatch(setIsLoading(true));
+    const response = await getAllProducts();
+    //   console.log("response:", response);
 
-  if (response?.status == "error") {
-    return toast.error(response.message || "Something went wrong!");
+    if (response?.status == "error") {
+      return toast.error(response.message || "Something went wrong!");
+    }
+    // If the response is successful, dispatch the setcategories action with the category data
+    dispatch(setProducts(response.payload || []));
+
+    return response;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    toast.error("Failed to fetch products. Please try again.");
+    dispatch(setProducts([]));
+  } finally {
+    dispatch(setIsLoading(false));
   }
-  // If the response is successful, dispatch the setcategories action with the category data
-  dispatch(setProducts(response.payload));
-
-  return response;
 };
+
 //get a product details by id
 export const getProductAction = (productId) => async (dispatch) => {
   const response = await getProduct(productId);
@@ -78,7 +88,7 @@ export const deleteProductAction = (productId) => async (dispatch) => {
   try {
     const response = await deleteProduct(productId);
     if (response.success || response.status === "success") {
-      toast.success(` Product deleted successfully!`);
+      toast.success(response.message || "Product deleted successfully!");
     } else {
       toast.error(response.message || "Failed to delete product.");
     }

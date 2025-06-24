@@ -1,5 +1,4 @@
-import React from "react";
-import { Save } from "lucide-react";
+import { Save, Sparkle } from "lucide-react";
 import useLoading from "../../hooks/useLoading";
 import { useEffect } from "react";
 import { getCategoryAction } from "../../redux/category/categoryAction";
@@ -11,18 +10,17 @@ import {
   addProductAction,
   updateProductAction,
 } from "../../redux/product/productAction";
-import {
-  initialProductFormData,
-  ProductFormControls,
-} from "../../config/formCongif";
+import { ProductFormControls } from "../../config/formCongif";
+import useForm from "../../hooks/useForm";
+import { useNavigate } from "react-router-dom";
+import { generateAIDescription } from "../../services/service";
+import { Button } from "../../components/ui/button";
 
-const ProductForm = ({
-  handleFormClose,
-  formData,
-  setFormData,
-  handleOnChange,
-}) => {
+const ProductForm = ({ initialFormData }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { formData, handleOnChange, setFormData } = useForm(initialFormData);
   const { isLoading, startLoading, stopLoading } = useLoading();
 
   // redux store
@@ -32,6 +30,11 @@ const ProductForm = ({
   useEffect(() => {
     dispatch(getCategoryAction());
   }, [dispatch]);
+
+  // Sync form state with initialFormData prop
+  useEffect(() => {
+    setFormData(initialFormData);
+  }, [initialFormData, setFormData]);
 
   const handleSubmitProduct = (e) => {
     e.preventDefault();
@@ -86,10 +89,8 @@ const ProductForm = ({
         dispatch(addProductAction(productData));
       }
 
-      // Reset form and close
-      if (handleFormClose) {
-        handleFormClose();
-      }
+      // Navigate back to products list on success
+      navigate("/admin/products");
     } catch (err) {
       console.error("Failed to save product", err);
       toast.error("Failed to save product");
@@ -115,10 +116,43 @@ const ProductForm = ({
     return options;
   };
 
+  // Helper to get category name from id
+  const getCategoryName = (categoryId) => {
+    const findCategory = (cats) => {
+      for (const cat of cats) {
+        if (cat._id === categoryId) return cat.name;
+        if (cat.children) {
+          const found = findCategory(cat.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    return findCategory(categories) || "not specified";
+  };
+
+  // AI Description Handler
+  const handleAIDescription = async () => {
+    startLoading();
+    try {
+      const aiDesc = await generateAIDescription({
+        title: formData.title,
+        category: getCategoryName(formData.categoryId),
+        tags: formData.tags,
+        brand: formData.brand,
+      });
+      setFormData((prev) => ({ ...prev, description: aiDesc }));
+    } catch (err) {
+      toast.error("Failed to generate AI description");
+    } finally {
+      stopLoading();
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-        {formData._id ? "Edit Product" : "Basic Information"}
+        {formData._id ? "Edit Product Details" : "Basic Information"}
       </h2>
 
       <form
@@ -149,6 +183,24 @@ const ProductForm = ({
                     : field.options
                 }
               />
+              {/* AI Description Button for Description Field */}
+              {field.name === "description" && (
+                <Button
+                  type="button"
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  onClick={handleAIDescription}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Sparkle className="h-4 w-4 animate-pulse" />
+                      <span>Auto-Generate Description</span>
+                    </div>
+                  )}
+                </Button>
+              )}
             </div>
           ))}
         </div>

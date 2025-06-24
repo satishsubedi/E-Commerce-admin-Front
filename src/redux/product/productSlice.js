@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   products: [],
   product: {},
+  isLoading: false,
 };
 
 //create a slice for product-related state management
@@ -18,11 +19,14 @@ const productSlice = createSlice({
     setProduct: (state, action) => {
       state.product = action.payload;
     },
+    setIsLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
 const { reducer: productReducer, actions } = productSlice;
 
 //destructure actions for easy access
-export const { setProducts, setProduct } = actions;
+export const { setProducts, setProduct, setIsLoading } = actions;
 export default productReducer;

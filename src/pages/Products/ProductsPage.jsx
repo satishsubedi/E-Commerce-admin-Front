@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Plus, Package, Edit, Trash2, Eye, X } from "lucide-react";
+import { useEffect } from "react";
+import { Plus, Package, Edit, Trash2, Eye } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import {
@@ -16,23 +16,31 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import ProductForm from "../../components/product/ProductForm";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllProductsAction } from "../../redux/product/productAction";
-import useForm from "../../hooks/useForm";
-import { initialProductFormData } from "../../config/formCongif";
+import {
+  deleteProductAction,
+  getAllProductsAction,
+} from "../../redux/product/productAction";
+import { useNavigate } from "react-router-dom";
+import PageLoadingSpinner from "../../components/helper/PageLoadingSpinner";
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
-  const [showCreateForm, setShowCreateForm] = useState(false);
-
-  // Use form data directly instead of separate editProduct state
-  const { formData, handleOnChange, setFormData } = useForm(
-    initialProductFormData
-  );
+  const navigate = useNavigate();
 
   // redux store
-  const { products } = useSelector((state) => state.product);
+  const { products, isLoading } = useSelector((state) => state.product);
   console.log("products", products);
 
   // Fetch products on component mount
@@ -46,104 +54,29 @@ const ProductsPage = () => {
         Active
       </Badge>
     ) : (
-      <Badge variant="secondary">Inactive</Badge>
+      <Badge className="bg-red-100 text-red-800">Out of Stock</Badge>
     );
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-AU", {
       style: "currency",
-      currency: "USD",
+      currency: "AUD",
     }).format(price);
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString("en-AU", {
+      day: "2-digit",
       month: "short",
-      day: "numeric",
+      year: "numeric",
     });
   };
 
-  const handleFormClose = () => {
-    setShowCreateForm(false);
-    setFormData(initialProductFormData);
-  };
-
-  const handleEditProduct = (product) => {
-    // Create properly structured product data for editing
-    const productData = {
-      _id: product?._id,
-      title: product?.title,
-      slug: product?.slug,
-      description: product?.description,
-      price: product?.price,
-      discountPrice: product?.discountPrice,
-      stock: product?.stock,
-      brand: product?.brand,
-      categoryId: product?.categoryId,
-      categoryPath: product?.categoryPath,
-
-      tags: Array.isArray(product?.tags)
-        ? product.tags.join(", ")
-        : product?.tags || "",
-      sizes: Array.isArray(product?.sizes)
-        ? product.sizes.join(", ")
-        : product?.sizes || "",
-      colors: Array.isArray(product?.colors)
-        ? product.colors.join(", ")
-        : product?.colors || "",
-      images: product?.images || [],
-      thumbnail: product?.thumbnail,
-      ratings: product?.ratings || 0,
-      status: product?.status || "active",
-      showForm: true,
-    };
-
-    setFormData(productData);
-    setShowCreateForm(true);
-  };
-
-  const handleCreateProduct = () => {
-    setFormData(initialProductFormData);
-    setShowCreateForm(true);
-  };
-
-  // If form is shown, render the form page
-  if (showCreateForm) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Package className="w-6 h-6 text-blue-600" />
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    {formData._id ? "Edit Product" : "Create New Product"}
-                  </h1>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleFormClose}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <ProductForm
-                handleFormClose={handleFormClose}
-                formData={formData}
-                setFormData={setFormData}
-                handleOnChange={handleOnChange}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <PageLoadingSpinner />
       </div>
     );
   }
@@ -162,7 +95,7 @@ const ProductsPage = () => {
             </div>
           </div>
           <Button
-            onClick={handleCreateProduct}
+            onClick={() => navigate("/admin/create-product")}
             className="bg-blue-600 hover:bg-blue-700"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -282,7 +215,9 @@ const ProductsPage = () => {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {product.categoryPath || "Uncategorized"}
+                          {product.categoryPath ||
+                            product.productPath ||
+                            "Uncategorized"}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">
@@ -306,23 +241,53 @@ const ProductsPage = () => {
                       <TableCell>{formatDate(product.createdAt)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
+                          {/* view details button */}
                           <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {/* edit button */}
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEditProduct(product)}
+                            // onClick={() => handleEditProduct(product._id)}
+                            onClick={() =>
+                              navigate(`/admin/edit-product/${product._id}`)
+                            }
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {/* delete button */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you Sure Want to delete this product?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    dispatch(deleteProductAction(product?._id))
+                                  }
+                                >
+                                  Continue
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -339,7 +304,7 @@ const ProductsPage = () => {
                   Get started by creating your first product.
                 </p>
                 <Button
-                  onClick={handleCreateProduct}
+                  onClick={() => navigate("/admin/create-product")}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />

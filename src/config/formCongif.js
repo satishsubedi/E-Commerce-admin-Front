@@ -76,7 +76,18 @@ export const ProductFormControls = [
     type: "select",
     placeholder: "Select  Product category",
   },
-
+  {
+    name: "brand",
+    label: "Brand",
+    type: "text",
+    placeholder: "Enter  Product brand",
+  },
+  {
+    name: "tags",
+    label: "Tags",
+    type: "text",
+    placeholder: "Tags (separated commas)",
+  },
   {
     name: "description",
     label: "Description*",
@@ -84,10 +95,16 @@ export const ProductFormControls = [
     placeholder: "Enter  product description",
   },
   {
-    name: "Image",
-    label: "Image*",
+    name: "images",
+    label: "Images*",
     type: "file",
     placeholder: "Upload images",
+  },
+  {
+    name: "thumbnail",
+    label: "Thumbnail*",
+    type: "file",
+    placeholder: "Upload Thumbnail",
   },
   {
     name: "price",
@@ -108,12 +125,7 @@ export const ProductFormControls = [
     type: "number",
     placeholder: "0",
   },
-  {
-    name: "brand",
-    label: "Brand",
-    type: "text",
-    placeholder: "Enter  Product brand",
-  },
+
   {
     name: "sizes",
     label: "Sizes",
@@ -127,12 +139,6 @@ export const ProductFormControls = [
     placeholder: "Colors (separated commas)",
   },
 
-  {
-    name: "tags",
-    label: "Tags",
-    type: "text",
-    placeholder: "Tags (separated commas)",
-  },
   {
     name: "Status",
     label: "Status*",

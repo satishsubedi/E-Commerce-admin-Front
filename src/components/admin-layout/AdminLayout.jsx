@@ -56,19 +56,20 @@ const AdminLayout = () => {
             setActiveItem={setActiveItem}
           />
           <SidebarItem
-            icon={<ShoppingCart />}
-            label="Orders"
-            path="/admin/orders"
-            activeItem={activeItem}
-            setActiveItem={setActiveItem}
-          />
-          <SidebarItem
             icon={<Package />}
             label="Products"
             path="/admin/products"
             activeItem={activeItem}
             setActiveItem={setActiveItem}
           />
+          <SidebarItem
+            icon={<ShoppingCart />}
+            label="Orders"
+            path="/admin/orders"
+            activeItem={activeItem}
+            setActiveItem={setActiveItem}
+          />
+
           <SidebarItem
             icon={<UserRoundSearch />}
             label="Users"

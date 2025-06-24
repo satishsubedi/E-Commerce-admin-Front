@@ -43,6 +43,5 @@ export const deleteProduct = (productId) => {
   return axiosApiCall({
     method: "delete",
     url: `${USER_API_URL}/deleteProducts/${productId}`,
-    isPrivate: true,
   });
 };
