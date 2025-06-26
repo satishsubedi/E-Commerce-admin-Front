@@ -4,21 +4,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-/**
- * ImageUploader Component
- * Props:
- * - multiple: boolean (allow multiple file selection)
- * - selectedFiles: array of File (for preview before upload)
- * - onFileChange: function (called with FileList or array of File)
- * - onRemoveSelected: function (index or void)
- * - onUpload: function (trigger upload)
- * - isLoading: boolean (uploading state)
- * - uploadProgress: number (0-100)
- * - uploadedImages: array of string (urls of already uploaded images)
- * - onRemoveUploaded: function (imageUrl, index)
- * - label: string (label for input)
- * - maxSizeMB: number (optional, for info display)
- */
 const ImageUploader = ({
   multiple = false,
   selectedFiles = [],
@@ -31,6 +16,7 @@ const ImageUploader = ({
   onRemoveUploaded,
   label = "Upload Images",
   maxSizeMB = 5,
+  hideInputIfUploaded = false,
 }) => {
   const inputRef = useRef();
 
@@ -39,26 +25,29 @@ const ImageUploader = ({
       <Label className="block text-sm font-medium text-gray-700 mb-3">
         {label}
       </Label>
-      <div className="relative">
-        <Input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          multiple={multiple}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          onChange={onFileChange}
-        />
-        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors bg-gray-50">
-          <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600 text-center">
-            <span className="font-medium text-primary">Click to upload</span> or
-            drag and drop
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            PNG, JPG, GIF up to {maxSizeMB}MB
-          </p>
+      {/* Only show input if not hiding or no uploaded images */}
+      {!(hideInputIfUploaded && uploadedImages.length > 0) && (
+        <div className="relative">
+          <Input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            multiple={multiple}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            onChange={onFileChange}
+          />
+          <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors bg-gray-50">
+            <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
+            <p className="text-sm text-gray-600 text-center">
+              <span className="font-medium text-primary">Click to upload</span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              PNG, JPG, GIF up to {maxSizeMB}MB
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Selected Files Preview */}
       {selectedFiles.length > 0 && (

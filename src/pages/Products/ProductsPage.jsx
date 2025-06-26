@@ -173,7 +173,8 @@ const ProductsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {products?.filter((p) => p.status === "active").length || 0}
+                {products?.filter((product) => product.status === "active")
+                  .length || 0}
               </div>
               <p className="text-xs text-muted-foreground">Active products</p>
             </CardContent>
@@ -187,8 +188,9 @@ const ProductsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {products?.filter((p) => p.status === "out_of_stock").length ||
-                  0}
+                {products?.filter(
+                  (product) => product.status === "out-of-stock"
+                ).length || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Out of stock products
@@ -237,7 +239,7 @@ const ProductsPage = () => {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                  <SelectItem value="out-of-stock">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={brandFilter} onValueChange={setBrandFilter}>

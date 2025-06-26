@@ -94,18 +94,7 @@ export const ProductFormControls = [
     type: "textarea",
     placeholder: "Enter  product description",
   },
-  // {
-  //   name: "images",
-  //   label: "Images*",
-  //   type: "file",
-  //   placeholder: "Upload images",
-  // },
-  // {
-  //   name: "thumbnail",
-  //   label: "Thumbnail*",
-  //   type: "file",
-  //   placeholder: "Upload Thumbnail",
-  // },
+
   {
     name: "price",
     label: "Price*",
@@ -140,7 +129,7 @@ export const ProductFormControls = [
   },
 
   {
-    name: "Status",
+    name: "status",
     label: "Status*",
     type: "select",
     placeholder: "Enter  Product tags",
