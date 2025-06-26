@@ -1,4 +1,3 @@
-import React from "react";
 import ProductForm from "../../components/product/ProductForm";
 import { initialProductFormData } from "../../config/formCongif";
 import { Button } from "../../components/ui/button";

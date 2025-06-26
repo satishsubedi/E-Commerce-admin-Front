@@ -6,20 +6,21 @@ const USER_API_URL = `${import.meta.env.VITE_APP_API_BASE_URL}/api/v1/auth`;
 // This function is used to get a new access token using the refresh token
 //  when the current access token is expired.
 
-// export const getNewAccessJwt = () => {
-//   return axiosApiCall({
-//     method: "get",
-//     url: `${USER_API_URL}/accessjwt`,
-//     isPrivate: true,
-//     useRefreshToken: true,
-//   });
-// };
+export const getNewAccessJwt = () => {
+  return axiosApiCall({
+    method: "get",
+    url: `${USER_API_URL}/accessjwt`,
+    isPrivate: true,
+    useRefreshToken: true,
+  });
+};
 
 // LOGIN USER | POST | /login  | PUBLIC
 export const loginUser = (loginData) => {
   return axiosApiCall({
     method: "post",
     url: `${USER_API_URL}/login`,
+    data: loginData,
   });
 };
 
@@ -28,6 +29,7 @@ export const getUser = () => {
   return axiosApiCall({
     method: "get",
     url: `${USER_API_URL}/user-info`,
+    isPrivate: true,
   });
 };
 

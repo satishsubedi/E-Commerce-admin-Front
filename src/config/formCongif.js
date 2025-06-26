@@ -94,18 +94,18 @@ export const ProductFormControls = [
     type: "textarea",
     placeholder: "Enter  product description",
   },
-  {
-    name: "images",
-    label: "Images*",
-    type: "file",
-    placeholder: "Upload images",
-  },
-  {
-    name: "thumbnail",
-    label: "Thumbnail*",
-    type: "file",
-    placeholder: "Upload Thumbnail",
-  },
+  // {
+  //   name: "images",
+  //   label: "Images*",
+  //   type: "file",
+  //   placeholder: "Upload images",
+  // },
+  // {
+  //   name: "thumbnail",
+  //   label: "Thumbnail*",
+  //   type: "file",
+  //   placeholder: "Upload Thumbnail",
+  // },
   {
     name: "price",
     label: "Price*",
@@ -117,7 +117,7 @@ export const ProductFormControls = [
     name: "discountPrice",
     label: "Discount Price",
     type: "number",
-    placeholder: "0.00",
+    placeholder: "Enter price after discount",
   },
   {
     name: "stock",
@@ -152,6 +152,10 @@ export const ProductFormControls = [
       {
         value: "inactive",
         label: "Inactive",
+      },
+      {
+        value: "out-of-stock",
+        label: "out-of-stock",
       },
     ],
   },

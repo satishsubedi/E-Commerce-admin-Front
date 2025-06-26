@@ -45,3 +45,12 @@ export const deleteProduct = (productId) => {
     url: `${USER_API_URL}/deleteProducts/${productId}`,
   });
 };
+// ADD images | POST | PRIVATE
+export const addProductImages = (productId, productObj) => {
+  return axiosApiCall({
+    method: "post",
+    url: `${USER_API_URL}/addProductImages/${productId}`,
+    data: productObj,
+    // isPrivate: true,
+  });
+};

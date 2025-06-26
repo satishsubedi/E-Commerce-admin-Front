@@ -35,13 +35,13 @@ export const getAllProductsAction = () => async (dispatch) => {
 //get a product details by id
 export const getProductAction = (productId) => async (dispatch) => {
   const response = await getProduct(productId);
-  //   console.log("response:", response);
+  // console.log("getProductAction:", response);
 
   if (response?.status == "error") {
     return toast.error(response.message || "Something went wrong!");
   }
   // If the response is successful, dispatch the setcategories action with the category data
-  dispatch(setProduct(response.data));
+  dispatch(setProduct(response.payload));
 
   return response;
 };
@@ -50,7 +50,7 @@ export const getProductAction = (productId) => async (dispatch) => {
 export const addProductAction = (productData) => async (dispatch) => {
   try {
     const response = await addProduct(productData);
-    console.log("response", response);
+    // console.log("response", response);
 
     if (response.success || response.status === "success") {
       toast.success(`${productData.title} Product added successfully!`);
@@ -66,18 +66,23 @@ export const addProductAction = (productData) => async (dispatch) => {
 
 //Update category Action
 export const updateProductAction =
-  (productId, productData) => async (dispatch) => {
+  (productId, productData, suppressSuccessMessage = false) =>
+  async (dispatch) => {
     try {
       const response = await updateProduct(productId, productData);
-      console.log("productData", productData);
+      // console.log("updateProduct", response);
 
       if (response.success || response.status === "success") {
-        toast.success(`${productData.title} Product updated successfully!`);
+        // Only show success message if not suppressed
+        if (!suppressSuccessMessage) {
+          toast.success(response.message || "Product updated successfully!");
+        }
       } else {
         toast.error(response.message || "Failed to update product.");
       }
       //  again fetch getAllProductsAction to get updated products
       dispatch(getAllProductsAction());
+      dispatch(getProductAction(response.payload._id));
     } catch (error) {
       toast.error("An error occurred while updating the product.");
     }

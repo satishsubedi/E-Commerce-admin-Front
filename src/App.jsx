@@ -17,6 +17,7 @@ import CategoryPage from "./pages/category/CategoryPage";
 import AddProduct from "./pages/AddProductPage";
 import CreateProductPage from "./pages/Products/CreateProductPage";
 import EditProductPage from "./pages/Products/EditProductPage";
+import ProductImagesPage from "./pages/Products/ProductImagesPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="products" element={<ProductsPage />} />
           <Route path="create-product" element={<CreateProductPage />} />
           <Route path="edit-product/:id" element={<EditProductPage />} />
+          <Route path="product-images/:id" element={<ProductImagesPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="coupons" element={<CouponsPage />} />
           <Route path="settings" element={<SettingPage />} />

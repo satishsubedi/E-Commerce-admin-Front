@@ -59,41 +59,6 @@ const FormControl = (props) => {
     );
   }
 
-  // when input attribute is file
-  if (inputAttributes.type === "file") {
-    // const handleFileChange = (e) => {
-    //    const files = Array.from(e.target.files);
-    //    setSelectedFiles(files);
-    //   handleOnChange(e);
-    // }
-    const { value, ...fileInputAttributes } = inputAttributes;
-
-    const files = inputAttributes.value || [];
-
-    return (
-      <div className="mb-6 col-span-full">
-        <Label htmlFor={inputAttributes.id} className="block font-bold mb-2">
-          {label}
-        </Label>
-        <div className="space-y-2">
-          <Input
-            {...fileInputAttributes}
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleOnChange}
-            className="w-full h-10  border-0 rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          {files.length > 0 && (
-            <p className="text-sm text-gray-500">
-              {files.length} file(s) selected
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   //use when we need to enter form data
   return (
     <div className="mb-4 ">

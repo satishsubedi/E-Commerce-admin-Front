@@ -22,11 +22,22 @@ const productSlice = createSlice({
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    // New action for optimistic updates
+    updateProductInList: (state, action) => {
+      const { productId, updatedProduct } = action.payload;
+      const index = state.products.findIndex(
+        (product) => product._id === productId
+      );
+      if (index !== -1) {
+        state.products[index] = { ...state.products[index], ...updatedProduct };
+      }
+    },
   },
 });
 
 const { reducer: productReducer, actions } = productSlice;
 
 //destructure actions for easy access
-export const { setProducts, setProduct, setIsLoading } = actions;
+export const { setProducts, setProduct, setIsLoading, updateProductInList } =
+  actions;
 export default productReducer;

@@ -1,5 +1,5 @@
 import axios from "axios";
-// import { getNewAccessJwt } from "./userAxios";
+import { getNewAccessJwt } from "./userAxios";
 
 export const axiosApiCall = async (axiosParams) => {
   // Destructure the parameters from axiosParams
@@ -17,7 +17,9 @@ export const axiosApiCall = async (axiosParams) => {
     : sessionStorage.getItem("accessJWT");
 
   // Set headers based on whether the request is private or not
-  const headers = { Authorization: isPrivate ? token : null };
+  const headers = {
+    Authorization: isPrivate && token ? token : null,
+  };
 
   try {
     // Make the API call using axios
@@ -35,20 +37,20 @@ export const axiosApiCall = async (axiosParams) => {
     // handle error
     // If access token is expired, try to get new access token using the refresh token
     // and use that new access token to call api
-    // if (error.message === "jwt expired") {
-    //   const response = await getNewAccessJwt();
+    if (error.message === "jwt expired") {
+      const response = await getNewAccessJwt();
 
-    //   if (response?.status === "success") {
-    //     sessionStorage.setItem("accessToken", response.data);
+      if (response?.status === "success") {
+        sessionStorage.setItem("accessToken", response.data);
 
-    //     return axiosApiCall(axiosParams);
-    //   }
+        return axiosApiCall(axiosParams);
+      }
 
-    //   return {
-    //     status: "error",
-    //     message: error.message || "Something went wrong!",
-    //   };
-    // }
+      return {
+        status: "error",
+        message: error.message || "Something went wrong!",
+      };
+    }
 
     console.error(error);
     throw error;

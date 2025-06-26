@@ -1,7 +1,17 @@
-import { useEffect } from "react";
-import { Plus, Package, Edit, Trash2, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Plus,
+  Package,
+  Edit,
+  Trash2,
+  Eye,
+  Search,
+  Image,
+  Palette,
+} from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -16,6 +26,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,28 +60,32 @@ const ProductsPage = () => {
   const { products, isLoading } = useSelector((state) => state.product);
   console.log("products", products);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [brandFilter, setBrandFilter] = useState("all");
+
   // Fetch products on component mount
   useEffect(() => {
     dispatch(getAllProductsAction());
   }, [dispatch]);
 
+  // Get status badge
   const getStatusBadge = (status) => {
-    return status === "active" ? (
-      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-        Active
-      </Badge>
-    ) : (
-      <Badge className="bg-red-100 text-red-800">Out of Stock</Badge>
-    );
+    switch (status) {
+      case "active":
+        return (
+          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+            Active
+          </Badge>
+        );
+      case "inactive":
+        return <Badge className="bg-red-100 text-gray-800">Inactive</Badge>;
+      default:
+        return <Badge className="bg-red-100 text-red-800">Out of Stock</Badge>;
+    }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-AU", {
-      style: "currency",
-      currency: "AUD",
-    }).format(price);
-  };
-
+  //format date
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-AU", {
       day: "2-digit",
@@ -72,6 +93,28 @@ const ProductsPage = () => {
       year: "numeric",
     });
   };
+
+  // Calculate discount percentage
+  const calculateDiscountPercentage = (price, discountPrice) => {
+    return Math.round(((price - discountPrice) / price) * 100);
+  };
+
+  // Filter Products based on search input
+  const filteredProducts = (products || []).filter((product) => {
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesBrand = brandFilter === "all" || product.brand === brandFilter;
+    const matchesStatus =
+      statusFilter === "all" || product.status === statusFilter;
+
+    return matchesSearch && matchesBrand && matchesStatus;
+  });
+
+  // Extract unique brands from products
+  const uniqueBrands = [
+    ...new Set(products?.map((product) => product.brand).filter(Boolean)),
+  ];
 
   if (isLoading) {
     return (
@@ -137,37 +180,33 @@ const ProductsPage = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Stock</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">
+                Out of Stock
+              </CardTitle>
+              <Badge className="bg-red-100 text-red-800">Out of Stock</Badge>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {products?.reduce(
-                  (sum, product) => sum + (product.stock || 0),
-                  0
-                ) || 0}
+                {products?.filter((p) => p.status === "out_of_stock").length ||
+                  0}
               </div>
               <p className="text-xs text-muted-foreground">
-                Units in inventory
+                Out of stock products
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-              <span className="text-sm font-medium">$</span>
+              <CardTitle className="text-sm font-medium">
+                Inactive Products
+              </CardTitle>
+              <Badge className="bg-gray-100 text-gray-800">Inactive</Badge>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatPrice(
-                  products?.reduce(
-                    (sum, product) =>
-                      sum + (product.price || 0) * (product.stock || 0),
-                    0
-                  ) || 0
-                )}
+                {products?.filter((p) => p.status === "inactive").length || 0}
               </div>
-              <p className="text-xs text-muted-foreground">Inventory value</p>
+              <p className="text-xs text-muted-foreground">Inactive products</p>
             </CardContent>
           </Card>
         </div>
@@ -178,140 +217,226 @@ const ProductsPage = () => {
             <CardTitle>Product List</CardTitle>
           </CardHeader>
           <CardContent>
-            {products && products.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Brand</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product._id}>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={
-                              product.thumbnail ||
-                              "https://via.placeholder.com/40x40?text=No+Image"
-                            }
-                            alt={product.title}
-                            className="w-10 h-10 rounded-lg object-cover"
-                          />
-                          <div>
-                            <div className="font-medium">{product.title}</div>
-                            <div className="text-sm text-gray-500 truncate max-w-[200px]">
-                              {product.description}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search products by title or slug..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={brandFilter} onValueChange={setBrandFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by brand" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Brands</SelectItem>
+                  {uniqueBrands.map((brand) => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand.charAt(0).toUpperCase() + brand.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Products Table */}
+            <div className="rounded-md overflow-hidden border">
+              {products && products.length > 0 ? (
+                filteredProducts.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>SN</TableHead>
+                        <TableHead>Product</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Stock</TableHead>
+                        <TableHead>Status</TableHead>
+
+                        <TableHead>Brand</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredProducts.map((product, index) => (
+                        <TableRow key={product._id}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              <img
+                                src={
+                                  product.thumbnail ||
+                                  "https://via.placeholder.com/40x40?text=No+Image"
+                                }
+                                alt={product.title}
+                                className="w-15 h-15 rounded-lg object-cover"
+                              />
+                              <div>
+                                <div className="font-medium">
+                                  {product.title}
+                                </div>
+                                <div className="text-sm text-gray-500 truncate max-w-[200px]">
+                                  {product.description}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {product.categoryPath ||
-                            product.productPath ||
-                            "Uncategorized"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatPrice(product.price)}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`font-medium ${
-                            (product.stock || 0) < 10
-                              ? "text-red-600"
-                              : (product.stock || 0) < 50
-                              ? "text-yellow-600"
-                              : "text-green-600"
-                          }`}
-                        >
-                          {product.stock || 0}
-                        </span>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(product.status)}</TableCell>
-                      <TableCell>{product.brand || "N/A"}</TableCell>
-                      <TableCell>{formatDate(product.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          {/* view details button */}
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {/* edit button */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            // onClick={() => handleEditProduct(product._id)}
-                            onClick={() =>
-                              navigate(`/admin/edit-product/${product._id}`)
-                            }
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          {/* delete button */}
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {product.categoryPath ||
+                                product.productPath ||
+                                "Uncategorized"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">
+                                  ${product.discountPrice}
+                                </span>
+                                {product.price !== product.discountPrice && (
+                                  <span className="text-sm text-muted-foreground line-through">
+                                    ${product.price}
+                                  </span>
+                                )}
+                              </div>
+                              {product.price !== product.discountPrice && (
+                                <div className="text-sm text-green-600">
+                                  {calculateDiscountPercentage(
+                                    product.price,
+                                    product.discountPrice
+                                  )}
+                                  % off
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`font-medium ${
+                                (product.stock || 0) < 5
+                                  ? "text-red-600"
+                                  : (product.stock || 0) < 10
+                                  ? "text-yellow-600"
+                                  : "text-green-600"
+                              }`}
+                            >
+                              {product.stock || 0}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(product.status)}
+                          </TableCell>
+
+                          <TableCell>{product.brand || "N/A"}</TableCell>
+                          <TableCell>{formatDate(product.createdAt)}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              {/* images  button */}
+                              <Button
+                                onClick={() =>
+                                  navigate(
+                                    `/admin/product-images/${product._id}`
+                                  )
+                                }
+                                variant="ghost"
+                                size="sm"
+                              >
+                                <Image className="h-4 w-4" />
+                              </Button>
+                              {/* edit button */}
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-red-600 hover:text-red-700"
+                                onClick={() =>
+                                  navigate(`/admin/edit-product/${product._id}`)
+                                }
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you Sure Want to delete this product?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() =>
-                                    dispatch(deleteProductAction(product?._id))
-                                  }
-                                >
-                                  Continue
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-8">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No products yet
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  Get started by creating your first product.
-                </p>
-                <Button
-                  onClick={() => navigate("/admin/create-product")}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Product
-                </Button>
-              </div>
-            )}
+                              {/* delete button */}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Are you Sure Want to delete this product?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        dispatch(
+                                          deleteProductAction(product?._id)
+                                        )
+                                      }
+                                    >
+                                      Continue
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="flex justify-center items-center h-32 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                    No products found matching your search
+                  </div>
+                )
+              ) : (
+                <div className="text-center py-8">
+                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No products yet
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    Get started by creating your first product.
+                  </p>
+                  <Button
+                    onClick={() => navigate("/admin/create-product")}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Your First Product
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

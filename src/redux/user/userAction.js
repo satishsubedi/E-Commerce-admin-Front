@@ -5,12 +5,16 @@ import { setUser } from "./userSlice";
 //Redux Thunk
 // GET USER ACTION
 export const getUserAction = () => async (dispatch) => {
+  console.log("getUserAction called");
   const response = await getUser();
+  console.log("getUser response:", response);
 
   if (response?.status == "error") {
-    return toast.error(response.message || "Something went wrong!");
+    toast.error(response.message || "Something went wrong!");
+    return response;
   }
   // If the response is successful, dispatch the setUser action with the user data
+  console.log("Dispatching setUser with payload:", response.payload);
   dispatch(setUser(response.payload));
 
   return response;
