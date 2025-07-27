@@ -1,28 +1,120 @@
-import { getUser, logoutUser } from "../../axios/userAxios";
+import {
+  createUser,
+  deleteUser,
+  getAllUsers,
+  getNewAccessJwt,
+  getUser,
+  logoutUser,
+  updateUser,
+} from "../../axios/userAxios";
 import { toast } from "react-toastify";
-import { setUser } from "./userSlice";
+import { setUser, setUsers } from "./userSlice";
 
 //Redux Thunk
 // GET USER ACTION
 export const getUserAction = () => async (dispatch) => {
-  console.log("getUserAction called");
   const response = await getUser();
-  console.log("getUser response:", response);
 
   if (response?.status == "error") {
-    toast.error(response.message || "Something went wrong!");
+    toast.error(response.message || "Error getting user");
     return response;
   }
   // If the response is successful, dispatch the setUser action with the user data
-  console.log("Dispatching setUser with payload:", response.payload);
   dispatch(setUser(response.payload));
 
   return response;
 };
 
-//UPDATE USER
+//GET ALL USER ACTION
+export const getAllUsersAction = () => async (dispatch) => {
+  const response = await getAllUsers();
 
-// LOGOUT USER
+  if (response?.status == "error") {
+    toast.error(response.message || "Error getting users!");
+    return response;
+  }
+  // If the response is successful, dispatch the setUser action with the user data
+
+  dispatch(setUsers(response.payload));
+};
+
+//CREATE USER ACTION
+export const createUserAction = (formData) => async (dispatch) => {
+  try {
+    const response = await createUser(formData);
+
+    if (response?.status === "error") {
+      toast.error(response.message || "Error creating user!");
+      return response;
+    }
+
+    // If the response is successful, dispatch the setUser action with the user data
+    dispatch(setUser(response.payload));
+    // Refresh the users list
+    dispatch(getAllUsersAction());
+    return response;
+  } catch (error) {
+    // Handle AxiosError and extract the error message
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Error creating user!";
+    toast.error(errorMessage);
+    throw error; // Re-throw to be handled by the component
+  }
+};
+
+//UPDATE USER ACTION
+export const updateUserAction = (userId, formData) => async (dispatch) => {
+  try {
+    const response = await updateUser(userId, formData);
+
+    if (response?.status === "error") {
+      toast.error(response.message || "Error updating user!");
+      return response;
+    }
+    // If the response is successful, dispatch the setUser action with the user data
+    dispatch(setUser(response.payload));
+    // Refresh the users list
+    dispatch(getAllUsersAction());
+    return response;
+  } catch (error) {
+    // Handle AxiosError and extract the error message
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Error updating user!";
+    toast.error(errorMessage);
+    throw error; // Re-throw to be handled by the component
+  }
+};
+
+//DELETE USER ACTION
+export const deleteUserAction = (userId) => async (dispatch) => {
+  try {
+    const response = await deleteUser(userId);
+
+    if (response?.status === "error") {
+      toast.error(response.message || "Error deleting user!");
+      return response;
+    }
+    // If the response is successful, dispatch the setUser action with the user data
+    dispatch(setUser(response.payload));
+    // Refresh the users list after successful deletion
+    dispatch(getAllUsersAction());
+    return response;
+  } catch (error) {
+    // Handle AxiosError and extract the error message
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Error deleting user!";
+    toast.error(errorMessage);
+    throw error; // Re-throw to be handled by the component
+  }
+};
+
+// LOGOUT USER ACTION
 export const logoutUserAction = (email) => async (dispatch) => {
   try {
     // call api to delete session and update user's refesh token
@@ -44,5 +136,50 @@ export const logoutUserAction = (email) => async (dispatch) => {
   } catch (error) {
     toast.error(error.message || "Logout failed");
     throw error;
+  }
+};
+
+// AUTOLOGIN
+export const autoLoginAction = () => async (dispatch) => {
+  const accessJWT = sessionStorage.getItem("accessJWT");
+  const refreshJWT = localStorage.getItem("refreshJWT");
+
+  // If no tokens exist, user is not logged in
+  if (!accessJWT && !refreshJWT) {
+    return;
+  }
+
+  // If access token exists, try to get user info
+  if (accessJWT) {
+    try {
+      const response = await getUser();
+      if (response?.status === "success") {
+        dispatch(setUser(response.payload));
+        return;
+      }
+    } catch (error) {
+      console.log("Access token invalid, trying refresh token");
+    }
+  }
+
+  // If no access token or access token is invalid, try refresh token
+  if (refreshJWT) {
+    try {
+      const response = await getNewAccessJwt();
+      if (response?.status === "success") {
+        sessionStorage.setItem("accessJWT", response.data);
+        // Now get user info with new access token
+        const userResponse = await getUser();
+        if (userResponse?.status === "success") {
+          dispatch(setUser(userResponse.payload));
+        }
+      }
+    } catch (error) {
+      console.log("Refresh token also invalid, clearing tokens");
+      // Clear invalid tokens
+      sessionStorage.removeItem("accessJWT");
+      localStorage.removeItem("refreshJWT");
+      dispatch(setUser({}));
+    }
   }
 };

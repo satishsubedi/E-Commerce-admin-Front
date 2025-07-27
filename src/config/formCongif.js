@@ -1,3 +1,80 @@
+export const SignUpFormControls = [
+  {
+    name: "fName",
+    label: "First Name*",
+    type: "text",
+    placeholder: "Enter first name",
+  },
+  {
+    name: "lName",
+    label: "Last Name*",
+    type: "text",
+    placeholder: "Enter last name",
+  },
+  {
+    name: "email",
+    label: "Email Address*",
+    type: "email",
+    placeholder: "Enter  email address",
+    autoComplete: "email",
+  },
+  {
+    name: "phone",
+    label: "Phone Number*",
+    type: "number",
+    placeholder: "+61 123456789",
+  },
+  {
+    name: "password",
+    label: "Password*",
+    type: "password",
+    placeholder: "***********",
+  },
+  {
+    name: "role",
+    label: "Role*",
+    type: "select",
+    placeholder: "Select role",
+    options: [
+      {
+        value: "admin",
+        label: "Admin",
+      },
+      {
+        value: "user",
+        label: "User",
+      },
+    ],
+  },
+  {
+    name: "status",
+    label: "Status*",
+    type: "select",
+    placeholder: "Select Stasus",
+    options: [
+      {
+        value: "active",
+        label: "Active",
+      },
+      {
+        value: "inactive",
+        label: "Inactive",
+      },
+    ],
+  },
+];
+
+//initial signup form
+export const initialSignupFormData = {
+  fName: "",
+  lName: "",
+  email: "",
+  phone: "",
+  password: "",
+  role: "user",
+  status: "active",
+};
+
 export const LogInFormControls = [
   {
     name: "email",

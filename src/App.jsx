@@ -13,11 +13,11 @@ import SettingPage from "./pages/setting/SettingPage";
 import CouponsPage from "./pages/Coupons/CouponsPage";
 import OrdersPage from "./pages/Orders/OrdersPage";
 import CategoryPage from "./pages/category/CategoryPage";
-
-import AddProduct from "./pages/AddProductPage";
 import CreateProductPage from "./pages/Products/CreateProductPage";
 import EditProductPage from "./pages/Products/EditProductPage";
 import ProductImagesPage from "./pages/Products/ProductImagesPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import PageNotFound from "./pages/pageNotFound/PageNotFound";
 
 function App() {
   return (
@@ -28,9 +28,17 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/forget-password" element={<ForgotPasswordPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
-        <Route path="/addProduct" element={<AddProduct />} />
+        <Route path="/*" element={<PageNotFound />} />
+
         {/* private Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="create-product" element={<CreateProductPage />} />

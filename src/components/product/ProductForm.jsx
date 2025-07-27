@@ -224,7 +224,7 @@ const ProductForm = ({ initialFormData }) => {
   return (
     <div className="space-y-8 p-6">
       <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-        {formData._id ? "Edit Product Details" : "Basic Information"}
+        Basic Information
       </h2>
 
       <form
@@ -265,7 +265,7 @@ const ProductForm = ({ initialFormData }) => {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <LoadingSpinner />
+                      `AI Generating...`
                     ) : (
                       <div className="flex items-center gap-2">
                         <Sparkle className="h-4 w-4 animate-pulse" />

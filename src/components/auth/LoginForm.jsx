@@ -67,13 +67,13 @@ const LoginForm = () => {
 
   // Logic to handle what should happen if a user is logged in
   const { user } = useSelector((state) => state.user);
-  // console.log("user data", user);
 
   useEffect(() => {
+    // Check if user is already logged in
     if (user?._id) {
       navigate("/admin/dashboard");
     }
-  }, [user, navigate]);
+  }, [user?._id, navigate]);
 
   return (
     <div className="flex flex-col justify-center px-10 md:px-20">
