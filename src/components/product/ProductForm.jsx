@@ -1,4 +1,4 @@
-import { Save, Sparkle, UploadCloud, X, Image } from "lucide-react";
+import { Save, Sparkle } from "lucide-react";
 import useLoading from "../../hooks/useLoading";
 import { useEffect, useState } from "react";
 import { getCategoryAction } from "../../redux/category/categoryAction";
@@ -16,8 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { generateAIDescription } from "../../services/service";
 import { Button } from "../../components/ui/button";
 import { uploadMedia } from "../../axios/uploadAxios";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import ImageUploader from "../common-Input/ImageUploader";
 
 const ProductForm = ({ initialFormData }) => {
   const dispatch = useDispatch();
@@ -225,7 +224,7 @@ const ProductForm = ({ initialFormData }) => {
   return (
     <div className="space-y-8 p-6">
       <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
-        {formData._id ? "Edit Product Details" : "Basic Information"}
+        Basic Information
       </h2>
 
       <form
@@ -266,7 +265,7 @@ const ProductForm = ({ initialFormData }) => {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <LoadingSpinner />
+                      `AI Generating...`
                     ) : (
                       <div className="flex items-center gap-2">
                         <Sparkle className="h-4 w-4 animate-pulse" />
@@ -282,110 +281,20 @@ const ProductForm = ({ initialFormData }) => {
 
         {/* Custom Thumbnail Upload Section */}
         <div className="col-span-full">
-          <Label className="block text-sm font-medium text-gray-700 mb-3">
-            Product Thumbnail *
-          </Label>
-
-          {/* Thumbnail Preview */}
-          {formData.thumbnail && (
-            <div className="mb-4">
-              <div className="relative inline-block">
-                <img
-                  src={formData.thumbnail}
-                  alt="Product thumbnail"
-                  className="h-32 w-32 object-cover rounded-lg border border-gray-200"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemoveThumbnail}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Thumbnail Upload */}
-          {!formData.thumbnail && (
-            <div className="space-y-4">
-              <div className="relative">
-                <Input
-                  id="thumbnail-upload"
-                  onChange={handleThumbnailSelection}
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors bg-gray-50">
-                  <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600 text-center">
-                    <span className="font-medium text-primary">
-                      Click to upload thumbnail
-                    </span>{" "}
-                    or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, GIF up to 5MB
-                  </p>
-                </div>
-              </div>
-
-              {/* Selected File Preview */}
-              {thumbnailFile && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                    Selected thumbnail
-                  </h4>
-                  <div className="flex items-center gap-3 mb-4">
-                    <Image className="h-8 w-8 text-gray-500" />
-                    <span className="text-sm text-gray-700">
-                      {thumbnailFile.name}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setThumbnailFile(null)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  {/* Upload Button */}
-                  <Button
-                    type="button"
-                    onClick={handleThumbnailUpload}
-                    disabled={isLoading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <LoadingSpinner />
-                        <span>Uploading... {thumbnailUploadProgress}%</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <UploadCloud className="h-4 w-4" />
-                        <span>Upload Thumbnail</span>
-                      </div>
-                    )}
-                  </Button>
-
-                  {/* Progress Bar */}
-                  {isLoading && thumbnailUploadProgress > 0 && (
-                    <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${thumbnailUploadProgress}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+          <ImageUploader
+            multiple={false}
+            selectedFiles={thumbnailFile ? [thumbnailFile] : []}
+            onFileChange={handleThumbnailSelection}
+            onRemoveSelected={() => setThumbnailFile(null)}
+            onUpload={handleThumbnailUpload}
+            isLoading={isLoading}
+            uploadProgress={thumbnailUploadProgress}
+            uploadedImages={formData.thumbnail ? [formData.thumbnail] : []}
+            onRemoveUploaded={(_, __) => handleRemoveThumbnail()}
+            label="Product Thumbnail *"
+            maxSizeMB={5}
+            hideInputIfUploaded={true}
+          />
         </div>
 
         {/* Submit Button */}

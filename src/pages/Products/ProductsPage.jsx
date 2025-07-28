@@ -1,14 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Plus,
-  Package,
-  Edit,
-  Trash2,
-  Eye,
-  Search,
-  Image,
-  Palette,
-} from "lucide-react";
+import { Plus, Package, Edit, Trash2, Search, Image } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -127,7 +118,7 @@ const ProductsPage = () => {
   // Main products list view
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className=" max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -173,7 +164,8 @@ const ProductsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {products?.filter((p) => p.status === "active").length || 0}
+                {products?.filter((product) => product.status === "active")
+                  .length || 0}
               </div>
               <p className="text-xs text-muted-foreground">Active products</p>
             </CardContent>
@@ -187,8 +179,9 @@ const ProductsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {products?.filter((p) => p.status === "out_of_stock").length ||
-                  0}
+                {products?.filter(
+                  (product) => product.status === "out-of-stock"
+                ).length || 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Out of stock products
@@ -237,7 +230,7 @@ const ProductsPage = () => {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                  <SelectItem value="out-of-stock">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={brandFilter} onValueChange={setBrandFilter}>
@@ -283,7 +276,7 @@ const ProductsPage = () => {
                               <img
                                 src={
                                   product.thumbnail ||
-                                  "https://via.placeholder.com/40x40?text=No+Image"
+                                  "https://placehold.co/150"
                                 }
                                 alt={product.title}
                                 className="w-15 h-15 rounded-lg object-cover"

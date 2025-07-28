@@ -41,7 +41,7 @@ export const axiosApiCall = async (axiosParams) => {
       const response = await getNewAccessJwt();
 
       if (response?.status === "success") {
-        sessionStorage.setItem("accessToken", response.data);
+        sessionStorage.setItem("accessJWT", response.data);
 
         return axiosApiCall(axiosParams);
       }

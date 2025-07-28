@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   user: {},
   users: [],
+  isLoading: false,
 };
 
 // Create a slice for user-related state management
@@ -23,6 +24,9 @@ const userSlice = createSlice({
     resetUser: (state) => {
       state.user = {};
     },
+    setIsLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
@@ -30,5 +34,5 @@ const userSlice = createSlice({
 const { reducer: userReducer, actions } = userSlice;
 
 //destructure actions for easy access
-export const { setUser, setUsers, resetUser } = actions;
+export const { setUser, setUsers, resetUser, setIsLoading } = actions;
 export default userReducer;

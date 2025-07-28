@@ -33,11 +33,43 @@ export const getUser = () => {
   });
 };
 
-//CREATE USER | POST |  SIGNUP |  PUBLIC
+//GET all the users | GET | PRIVATE
+export const getAllUsers = () => {
+  return axiosApiCall({
+    method: "get",
+    url: `${USER_API_URL}/all-users`,
+    // isPrivate: true,
+  });
+};
 
-//UPDATE USER ROLE  | FOR ADMIN
+//CREATE a new user | POST | PRIVATE
+export const createUser = (userData) => {
+  return axiosApiCall({
+    method: "post",
+    url: `${USER_API_URL}/register`,
+    data: userData,
+    isPrivate: true,
+  });
+};
 
-// UPDATE USER | PATCH | PRIVATE
+//UPDATE a user | PATCH | PRIVATE
+export const updateUser = (userId, userData) => {
+  return axiosApiCall({
+    method: "patch",
+    url: `${USER_API_URL}/${userId}`,
+    data: userData,
+    isPrivate: true,
+  });
+};
+
+//DELETE a user | DELETE | PRIVATE
+export const deleteUser = (userId) => {
+  return axiosApiCall({
+    method: "delete",
+    url: `${USER_API_URL}/${userId}`,
+    isPrivate: true,
+  });
+};
 
 //LOGOUT USER | POST | PRIVATE
 export const logoutUser = (email) => {
