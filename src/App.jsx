@@ -14,7 +14,6 @@ import CouponsPage from "./pages/Coupons/CouponsPage";
 import OrdersPage from "./pages/Orders/OrdersPage";
 import CategoryPage from "./pages/category/CategoryPage";
 
-import AddProduct from "./pages/AddProductPage";
 import CreateProductPage from "./pages/Products/CreateProductPage";
 import EditProductPage from "./pages/Products/EditProductPage";
 import ProductImagesPage from "./pages/Products/ProductImagesPage";
@@ -28,7 +27,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/forget-password" element={<ForgotPasswordPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
-        <Route path="/addProduct" element={<AddProduct />} />
+
         {/* private Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
