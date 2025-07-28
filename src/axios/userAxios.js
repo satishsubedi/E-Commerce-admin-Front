@@ -38,7 +38,7 @@ export const getAllUsers = () => {
   return axiosApiCall({
     method: "get",
     url: `${USER_API_URL}/all-users`,
-    isPrivate: true,
+    // isPrivate: true,
   });
 };
 

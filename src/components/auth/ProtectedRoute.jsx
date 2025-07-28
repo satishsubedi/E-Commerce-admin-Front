@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { autoLoginAction } from "../../redux/user/userAction";
 import LoadingSpinner from "../helper/LoadingSpinner";
 
@@ -39,6 +39,12 @@ const ProtectedRoute = ({ children }) => {
     }
 
     return null; // Will redirect to login
+  }
+
+  // Check if user is admin
+  if (user?.role !== "admin") {
+    // Redirect non-admin users to their dashboard
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

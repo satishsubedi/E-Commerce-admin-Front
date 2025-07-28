@@ -11,7 +11,7 @@ import {
 } from "../../config/formCongif";
 import FormControl from "../common-Input/FormControl";
 import { toast } from "react-toastify";
-import { getUserAction } from "../../redux/user/userAction";
+import { autoLoginAction, getUserAction } from "../../redux/user/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingSpinner from "../helper/LoadingSpinner";
 import { Link, useNavigate } from "react-router-dom";
@@ -68,12 +68,31 @@ const LoginForm = () => {
   // Logic to handle what should happen if a user is logged in
   const { user } = useSelector((state) => state.user);
 
+  // useEffect(() => {
+  //   // Check if user is already logged in
+  //   if (user?._id) {
+  //     navigate("/admin/dashboard");
+  //   }
+  // }, [user?._id, navigate]);
+
   useEffect(() => {
-    // Check if user is already logged in
+    // if user exists [logged in], navigate to homepage
     if (user?._id) {
       navigate("/admin/dashboard");
     }
-  }, [user?._id, navigate]);
+
+    // if no tokens, keep them in login page
+    if (
+      !sessionStorage.getItem("accessJWT") &&
+      !localStorage.getItem("refreshJWT")
+    ) {
+      return;
+    }
+    // if not try auto login
+    if (!user?._id) {
+      dispatch(autoLoginAction());
+    }
+  }, [user?._id, navigate, dispatch]);
 
   return (
     <div className="flex flex-col justify-center px-10 md:px-20">

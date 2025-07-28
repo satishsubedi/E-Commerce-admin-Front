@@ -119,7 +119,6 @@ export const logoutUserAction = (email) => async (dispatch) => {
   try {
     // call api to delete session and update user's refesh token
     const response = await logoutUser(email);
-    console.log("logout response", response);
 
     if (response?.status === "success") {
       // remove tokens from storage
@@ -144,42 +143,19 @@ export const autoLoginAction = () => async (dispatch) => {
   const accessJWT = sessionStorage.getItem("accessJWT");
   const refreshJWT = localStorage.getItem("refreshJWT");
 
-  // If no tokens exist, user is not logged in
-  if (!accessJWT && !refreshJWT) {
-    return;
-  }
+  if (!accessJWT && refreshJWT) {
+    const response = await getNewAccessJwt();
 
-  // If access token exists, try to get user info
+    if (response?.status === "success") {
+      sessionStorage.setItem("accessJWT", response.payload.accessJWT);
+
+      dispatch(getUserAction());
+      return;
+    }
+  }
+  //  Have accessJWT - validate it by getting user
   if (accessJWT) {
-    try {
-      const response = await getUser();
-      if (response?.status === "success") {
-        dispatch(setUser(response.payload));
-        return;
-      }
-    } catch (error) {
-      console.log("Access token invalid, trying refresh token");
-    }
-  }
-
-  // If no access token or access token is invalid, try refresh token
-  if (refreshJWT) {
-    try {
-      const response = await getNewAccessJwt();
-      if (response?.status === "success") {
-        sessionStorage.setItem("accessJWT", response.data);
-        // Now get user info with new access token
-        const userResponse = await getUser();
-        if (userResponse?.status === "success") {
-          dispatch(setUser(userResponse.payload));
-        }
-      }
-    } catch (error) {
-      console.log("Refresh token also invalid, clearing tokens");
-      // Clear invalid tokens
-      sessionStorage.removeItem("accessJWT");
-      localStorage.removeItem("refreshJWT");
-      dispatch(setUser({}));
-    }
+    dispatch(getUserAction());
+    return;
   }
 };
