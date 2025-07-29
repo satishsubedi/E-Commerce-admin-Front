@@ -61,17 +61,19 @@ const CreateOrEditUserDialogue = (props) => {
       if (userId) {
         // Update existing user - exclude password field
         const { password, ...updateData } = formData;
-        const response = dispatch(updateUserAction(userId, updateData));
+        const response = await dispatch(updateUserAction(userId, updateData));
+
         if (response?.status === "success") {
-          toast.success("User updated successfully!");
+          toast.success(response?.message || "User updated!");
           onSave && onSave(updateData);
           onOpenChange(false);
         }
       } else {
         // Create new user
-        const response = dispatch(createUserAction(formData));
+        const response = await dispatch(createUserAction(formData));
+
         if (response?.status === "success") {
-          toast.success("User created successfully!");
+          toast.success(response?.message || "User created!");
           onSave && onSave(formData);
           onOpenChange(false);
         }

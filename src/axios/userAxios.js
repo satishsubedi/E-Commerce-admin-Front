@@ -56,7 +56,7 @@ export const createUser = (userData) => {
 export const updateUser = (userId, userData) => {
   return axiosApiCall({
     method: "patch",
-    url: `${USER_API_URL}/${userId}`,
+    url: `${USER_API_URL}/update/${userId}`,
     data: userData,
     isPrivate: true,
   });
@@ -66,7 +66,7 @@ export const updateUser = (userId, userData) => {
 export const deleteUser = (userId) => {
   return axiosApiCall({
     method: "delete",
-    url: `${USER_API_URL}/${userId}`,
+    url: `${USER_API_URL}/delete/${userId}`,
     isPrivate: true,
   });
 };

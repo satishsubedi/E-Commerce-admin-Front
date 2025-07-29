@@ -48,13 +48,10 @@ export const createUserAction = (formData) => async (dispatch) => {
       return response;
     }
 
-    // If the response is successful, dispatch the setUser action with the user data
-    dispatch(setUser(response.payload));
-    // Refresh the users list
+    // If the response is successful, refresh the users list
     dispatch(getAllUsersAction());
     return response;
   } catch (error) {
-    // Handle AxiosError and extract the error message
     const errorMessage =
       error?.response?.data?.message ||
       error?.message ||
@@ -68,18 +65,16 @@ export const createUserAction = (formData) => async (dispatch) => {
 export const updateUserAction = (userId, formData) => async (dispatch) => {
   try {
     const response = await updateUser(userId, formData);
+    console.log("Update Response:", response);
 
     if (response?.status === "error") {
       toast.error(response.message || "Error updating user!");
       return response;
     }
-    // If the response is successful, dispatch the setUser action with the user data
-    dispatch(setUser(response.payload));
-    // Refresh the users list
-    dispatch(getAllUsersAction());
+    // If the response is successful, refresh the users list
+    await dispatch(getAllUsersAction());
     return response;
   } catch (error) {
-    // Handle AxiosError and extract the error message
     const errorMessage =
       error?.response?.data?.message ||
       error?.message ||
@@ -98,13 +93,11 @@ export const deleteUserAction = (userId) => async (dispatch) => {
       toast.error(response.message || "Error deleting user!");
       return response;
     }
-    // If the response is successful, dispatch the setUser action with the user data
-    dispatch(setUser(response.payload));
-    // Refresh the users list after successful deletion
+    toast.success(response.message || "User deleted!");
+    // If the response is successful, refresh the users list after successful deletion
     dispatch(getAllUsersAction());
     return response;
   } catch (error) {
-    // Handle AxiosError and extract the error message
     const errorMessage =
       error?.response?.data?.message ||
       error?.message ||

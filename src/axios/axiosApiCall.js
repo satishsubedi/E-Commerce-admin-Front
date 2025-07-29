@@ -29,6 +29,7 @@ export const axiosApiCall = async (axiosParams) => {
       data,
       headers,
     });
+
     if (response.data.status === "error") {
       throw { message: response.data.message || "An error occurred" };
     }
