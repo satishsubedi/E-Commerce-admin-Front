@@ -5,7 +5,6 @@ import {
   getCategoryTree,
   updateCategory,
 } from "../../axios/categoryAxios";
-import { axiosApiCall } from "../../axios/axiosApiCall";
 
 //Redux Thunk
 //Get Category Action

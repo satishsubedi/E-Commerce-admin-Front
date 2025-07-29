@@ -18,7 +18,7 @@ import EditProductPage from "./pages/Products/EditProductPage";
 import ProductImagesPage from "./pages/Products/ProductImagesPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PageNotFound from "./pages/pageNotFound/PageNotFound";
-import UnauthorizedPage from "./pages/UnAuthorizedPage./UnauthorizedPage";
+import UnauthorizedPage from "./pages/UnAuthorizedPage/UnauthorizedPage";
 
 function App() {
   return (
@@ -30,7 +30,6 @@ function App() {
         <Route path="/forget-password" element={<ForgotPasswordPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route path="/*" element={<PageNotFound />} />
-
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* private Routes */}

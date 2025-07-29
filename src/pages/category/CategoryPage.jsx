@@ -23,7 +23,7 @@ const CategoryPage = () => {
     useForm(initialCategoryState);
   // redux store
   const { categories } = useSelector((state) => state.category);
-  // console.log("categories", categories);
+  console.log("categories", categories);
 
   // Fetch categories on component mount
   useEffect(() => {

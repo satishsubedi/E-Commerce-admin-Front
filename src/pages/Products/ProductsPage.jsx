@@ -49,7 +49,7 @@ const ProductsPage = () => {
 
   // redux store
   const { products, isLoading } = useSelector((state) => state.product);
-  console.log("products", products);
+  // console.log("products", products);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
