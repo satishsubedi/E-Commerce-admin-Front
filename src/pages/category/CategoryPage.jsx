@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Layers } from "lucide-react";
+import { Plus, Layers, ChartColumnStacked } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "react-toastify";
@@ -10,6 +10,7 @@ import {
   getCategoryAction,
   addCategoryAction,
   updateCategoryAction,
+  deleteCategoryAction,
 } from "../../redux/category/categoryAction";
 import useForm from "../../hooks/useForm";
 import { initialCategoryState } from "../../config/formCongif";
@@ -23,7 +24,7 @@ const CategoryPage = () => {
     useForm(initialCategoryState);
   // redux store
   const { categories } = useSelector((state) => state.category);
-  console.log("categories", categories);
+  // console.log("categories", categories);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -69,25 +70,23 @@ const CategoryPage = () => {
   const handleDeleteCategory = async (categoryId) => {
     if (!confirm("Are you sure you want to delete this category?")) return;
 
-    try {
-      await axios.delete(`${API}/product/category/${categoryId}`);
-      dispatch(getCategoryAction()); // Refresh categories from Redux
-    } catch (err) {
-      console.error("Failed to delete category", err);
-    }
+    dispatch(deleteCategoryAction(categoryId));
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Category Management
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage your e-commerce product categories
-          </p>
+      <header className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <ChartColumnStacked className="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Category Management
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Manage your e-commerce product categories
+            </p>
+          </div>
         </div>
         <Button
           className="bg-blue-600 hover:bg-blue-700 mr-7"
@@ -98,7 +97,7 @@ const CategoryPage = () => {
           <Plus className="h-4 w-4 mr-2" />
           Add Root Category
         </Button>
-      </div>
+      </header>
 
       {/* Add/Edit Category Form */}
       {formData.showForm && formData.parentId === null && (
@@ -134,7 +133,7 @@ const CategoryPage = () => {
               handleOnChange={handleOnChange}
               toggleCategory={toggleCategory}
               handleAddCategory={handleAddCategory}
-              onDeleteCategory={handleDeleteCategory}
+              handleDeleteCategory={handleDeleteCategory}
             />
           ))}
         </CardContent>

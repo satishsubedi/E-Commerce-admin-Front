@@ -10,7 +10,7 @@ export const getOrderAction = () => async (dispatch) => {
   try {
     dispatch(setOrderLoading(true));
     const response = await getOrderApi();
-    console.log("Orders API Raw Response:", response);
+    // console.log("Orders API Raw Response:", response);
 
     if (response?.success) {
       dispatch(setOrders(response.orders));

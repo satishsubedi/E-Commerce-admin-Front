@@ -21,13 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import FilterSelect from "../../components/helper/FilterSelect";
 import {
   Table,
   TableBody,
@@ -39,6 +33,7 @@ import {
 import StatsCard from "../../components/helper/StatsCard";
 import formatDate from "../../utils/FormatDate";
 import StatusBadge from "../../components/helper/StatusBadge";
+import ConfirmDelete from "../../components/helper/ConfirmDelete";
 import UserDetailsDialogue from "../../components/user/userDetailsDialogue";
 import CreateOrEditUserDialogue from "../../components/user/CreateOrEditUserDialogue";
 import { useDispatch, useSelector } from "react-redux";
@@ -96,16 +91,10 @@ const UsersPage = () => {
     setIsCreateDialogOpen(true);
   };
 
-  // Handle delete user
-  const handleDeleteUser = (user) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${user.fName} ${user.lName}?`
-      )
-    ) {
-      dispatch(deleteUserAction(user._id));
-    }
-  };
+  // // Handle delete user
+  // const handleDeleteUser = (user) => {
+  //   dispatch(deleteUserAction(user._id));
+  // };
 
   // Handle save user (create or update)
   const handleSaveUser = (userData) => {
@@ -141,14 +130,17 @@ const UsersPage = () => {
     <div className="min-h-screen p-6 bg-gray-50 ">
       <div className=" max-w-7xl mx-auto space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold tect-gray-900 mb-2 flex items-center gap-3">
-              <UserRoundSearch className="w-8 h-8 text-blue-600" />
-              User Management
-            </h1>
-            <p>Manage user accounts and permissions</p>
-          </header>
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <UserRoundSearch className="w-8 h-8 text-blue-600" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {" "}
+                User Management
+              </h1>
+              <p>Manage your user accounts and permissions</p>
+            </div>
+          </div>
           <Button
             onClick={handleCreateUser}
             className="bg-blue-600 hover:bg-blue-700"
@@ -156,7 +148,7 @@ const UsersPage = () => {
             <Plus className="w-4 h-4 " />
             Add User
           </Button>
-        </div>
+        </header>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 ">
@@ -208,34 +200,36 @@ const UsersPage = () => {
                 />
               </div>
 
-              {/* Filter Toggle */}
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="user">User</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Filter status */}
+              <FilterSelect
+                value={statusFilter}
+                onValueChange={setStatusFilter}
+                placeholder="Filter by status"
+                options={[
+                  { value: "all", label: "All Status" },
+                  { value: "active", label: "Active" },
+                  { value: "inactive", label: "Inactive" },
+                ]}
+              />
+
+              {/* Filter role */}
+              <FilterSelect
+                value={roleFilter}
+                onValueChange={setRoleFilter}
+                placeholder="Filter by role"
+                options={[
+                  { value: "all", label: "All Roles" },
+                  { value: "admin", label: "Admin" },
+                  { value: "user", label: "User" },
+                ]}
+              />
             </div>
             {/* Users Table */}
             <div className="rounded-md overflow-hidden border">
-              <div className="max-h-[500px] overflow-y-auto">
+              <div className="max-h-[400px] overflow-y-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="px-6 py-4 text-left text-xs font-medium tracking-wider ">
+                    <TableRow className="px-6 py-4 text-left text-xs font-medium tracking-wider">
                       <TableHead>SN</TableHead>
                       <TableHead>USER</TableHead>
                       <TableHead>CONTACT</TableHead>
@@ -318,14 +312,11 @@ const UsersPage = () => {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button
-                              className="text-red-600  hover:text-red-900"
-                              variant="ghost"
-                              title="Delete User"
-                              onClick={() => handleDeleteUser(user)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <ConfirmDelete
+                              onDelete={() =>
+                                dispatch(deleteUserAction(user._id))
+                              }
+                            />
                           </div>
                         </TableCell>
                       </TableRow>

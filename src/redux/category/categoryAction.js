@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { setCategories } from "./categorySlice";
 import {
   addCategory,
+  deleteCategory,
   getCategoryTree,
   updateCategory,
 } from "../../axios/categoryAxios";
@@ -57,3 +58,26 @@ export const updateCategoryAction =
       toast.error("An error occurred while updating the category.");
     }
   };
+
+// Delete Category Action
+export const deleteCategoryAction = (categoryId) => async (dispatch) => {
+  try {
+    const response = await deleteCategory(categoryId);
+
+    if (response.success || response.status === "success") {
+      toast.success(response.message || "Category deleted successfully!");
+
+      //  again fetch getCategoryAction to get updated categories
+      dispatch(getCategoryAction());
+    } else {
+      toast.error(response.message || "Failed to delete category.");
+    }
+  } catch (error) {
+    console.error("Delete category error:", error);
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "An error occurred while deleting the category.";
+    toast.error(message);
+  }
+};

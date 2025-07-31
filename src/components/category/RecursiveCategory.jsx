@@ -22,7 +22,7 @@ const RecursiveCategory = (props) => {
     toggleCategory,
     setFormData,
     handleAddCategory,
-    onDeleteCategory,
+    handleDeleteCategory,
     handleOnChange,
   } = props;
 
@@ -91,7 +91,7 @@ const RecursiveCategory = (props) => {
         <div className="flex items-center space-x-2 ml-4">
           <Button
             variant="outline"
-            size="sm"
+            title="Add Subcategory"
             className="h-8"
             onClick={() =>
               setFormData({
@@ -106,7 +106,7 @@ const RecursiveCategory = (props) => {
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            title="Edit Category"
             className="h-8"
             onClick={() => setFormData(categoryData)}
           >
@@ -114,9 +114,9 @@ const RecursiveCategory = (props) => {
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            title="Delete Category"
             className="h-8 text-red-600 hover:text-red-700"
-            onClick={() => onDeleteCategory(category._id)}
+            onClick={() => handleDeleteCategory(category._id)}
           >
             <Trash2 className="h-3 w-3" />
           </Button>
@@ -145,7 +145,7 @@ const RecursiveCategory = (props) => {
               handleOnChange={handleOnChange}
               toggleCategory={toggleCategory}
               handleAddCategory={handleAddCategory}
-              onDeleteCategory={onDeleteCategory}
+              handleDeleteCategory={handleDeleteCategory}
             />
           ))}
         </div>

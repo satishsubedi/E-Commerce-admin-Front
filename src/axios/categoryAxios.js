@@ -25,7 +25,7 @@ export const addCategory = (category) => {
 export const deleteCategory = (categoryId) => {
   return axiosApiCall({
     method: "delete",
-    url: `${USER_API_URL}/product/category/${categoryId}`,
+    url: `${USER_API_URL}/delete/${categoryId}`,
     // isPrivate: true,
   });
 };
@@ -34,7 +34,7 @@ export const deleteCategory = (categoryId) => {
 export const updateCategory = (categoryId, categoryobj) => {
   return axiosApiCall({
     method: "patch",
-    url: `${USER_API_URL}/product/category/${categoryId}`,
+    url: `${USER_API_URL}/updateCategory/${categoryId}`,
     data: categoryobj,
     // isPrivate: true,
   });
