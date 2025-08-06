@@ -8,6 +8,8 @@ import {
   ChartColumnStacked,
   LayoutDashboard,
   LogOut,
+  MessageSquare,
+  MoonStar,
   Package,
   Settings,
   ShoppingCart,
@@ -84,6 +86,13 @@ const AdminLayout = () => {
             setActiveItem={setActiveItem}
           />
           <SidebarItem
+            icon={<MessageSquare />}
+            label="Reviews"
+            path="/admin/reviews"
+            activeItem={activeItem}
+            setActiveItem={setActiveItem}
+          />
+          <SidebarItem
             icon={<Ticket />}
             label="Coupons"
             path="/admin/coupons"
@@ -94,6 +103,13 @@ const AdminLayout = () => {
             icon={<Settings />}
             label="Settings"
             path="/admin/settings"
+            activeItem={activeItem}
+            setActiveItem={setActiveItem}
+          />
+          <SidebarItem
+            icon={<LogOut />}
+            label="Logout"
+            onClick={handleLogout}
             activeItem={activeItem}
             setActiveItem={setActiveItem}
           />
@@ -115,14 +131,6 @@ const AdminLayout = () => {
               </p>
               <p className="text-xs text-gray-500 ">{user.email || "NAN"}</p>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="p-1 h-8 w-8"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>

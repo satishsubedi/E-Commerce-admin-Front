@@ -14,6 +14,7 @@ import {
 } from "../../redux/category/categoryAction";
 import useForm from "../../hooks/useForm";
 import { initialCategoryState } from "../../config/formCongif";
+import PageLoadingSpinner from "../../components/helper/PageLoadingSpinner";
 
 const CategoryPage = () => {
   const dispatch = useDispatch();
@@ -23,8 +24,7 @@ const CategoryPage = () => {
   const { formData, handleOnChange, setFormData } =
     useForm(initialCategoryState);
   // redux store
-  const { categories } = useSelector((state) => state.category);
-  // console.log("categories", categories);
+  const { categories, loading } = useSelector((state) => state.category);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -68,10 +68,17 @@ const CategoryPage = () => {
 
   // Handle deleting a category
   const handleDeleteCategory = async (categoryId) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
     dispatch(deleteCategoryAction(categoryId));
   };
+
+  // Show loading spinner
+  {
+    loading && (
+      <div className="flex items-center justify-center h-screen">
+        <PageLoadingSpinner pageName={"categories"} />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -118,7 +125,7 @@ const CategoryPage = () => {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Layers className="h-5 w-5" />
-            <span>Category Hierarchy</span>
+            <span>Category Hierarchy({categories.length})</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-2">
@@ -136,6 +143,16 @@ const CategoryPage = () => {
               handleDeleteCategory={handleDeleteCategory}
             />
           ))}
+          {categories.length === 0 && (
+            <div className="text-center py-12">
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                No categories found
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Start by adding a new category
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

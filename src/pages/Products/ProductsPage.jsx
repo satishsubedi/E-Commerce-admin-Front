@@ -88,8 +88,8 @@ const ProductsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <PageLoadingSpinner />
+      <div className="flex items-center justify-center h-screen">
+        <PageLoadingSpinner pageName={"products"} />
       </div>
     );
   }
@@ -154,7 +154,7 @@ const ProductsPage = () => {
         {/* Products Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Product List</CardTitle>
+            <CardTitle>Product List({filteredProducts.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -199,152 +199,127 @@ const ProductsPage = () => {
 
             {/* Products Table */}
             <div className="rounded-md overflow-hidden border">
-              {products && products.length > 0 ? (
-                <div className="max-h-[420px] overflow-y-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="px-6 py-4 text-left text-xs font-medium tracking-wider">
-                        <TableHead>SN</TableHead>
-                        <TableHead>PRODUCT</TableHead>
-                        <TableHead>CATEGORY</TableHead>
-                        <TableHead>PRICE</TableHead>
-                        <TableHead>STOCK</TableHead>
-                        <TableHead>STATUS</TableHead>
-                        <TableHead>BRAND</TableHead>
-                        <TableHead>CREATED</TableHead>
-                        <TableHead className="text-right">ACTIONS</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredProducts.map((product, index) => (
-                        <TableRow key={product._id}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-3">
-                              <img
-                                src={
-                                  product.thumbnail ||
-                                  "https://placehold.co/150"
-                                }
-                                alt={product.title}
-                                className="w-15 h-15 rounded-lg object-cover"
-                              />
-                              <div>
-                                <div className="font-medium">
-                                  {product.title}
-                                </div>
-                                <div className="text-sm text-gray-500 truncate max-w-[200px]">
-                                  {product.description}
-                                </div>
+              <div className="max-h-[420px] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="px-6 py-4 text-left text-xs font-medium tracking-wider">
+                      <TableHead>SN</TableHead>
+                      <TableHead>PRODUCT</TableHead>
+                      <TableHead>CATEGORY</TableHead>
+                      <TableHead>PRICE</TableHead>
+                      <TableHead>STOCK</TableHead>
+                      <TableHead>STATUS</TableHead>
+                      <TableHead>BRAND</TableHead>
+                      <TableHead>CREATED</TableHead>
+                      <TableHead className="text-right">ACTIONS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProducts.map((product, index) => (
+                      <TableRow key={product._id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={
+                                product.thumbnail || "https://placehold.co/150"
+                              }
+                              alt={product.title}
+                              className="w-15 h-15 rounded-lg object-cover"
+                            />
+                            <div>
+                              <div className="font-medium">{product.title}</div>
+                              <div className="text-sm text-gray-500 truncate max-w-[200px]">
+                                {product.description}
                               </div>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-right ">
-                            <Badge variant="outline">
-                              {product.productPath || "Uncategorized"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">
-                                  ${product.discountPrice}
-                                </span>
-                                {product.price !== product.discountPrice && (
-                                  <span className="text-sm text-muted-foreground line-through">
-                                    ${product.price}
-                                  </span>
-                                )}
-                              </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right ">
+                          <Badge variant="outline">
+                            {product.productPath || "Uncategorized"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">
+                                ${product.discountPrice}
+                              </span>
                               {product.price !== product.discountPrice && (
-                                <div className="text-sm text-green-600">
-                                  {calculateDiscountPercentage(
-                                    product.price,
-                                    product.discountPrice
-                                  )}
-                                  % off
-                                </div>
+                                <span className="text-sm text-muted-foreground line-through">
+                                  ${product.price}
+                                </span>
                               )}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <span
-                              className={`font-medium ${getStockColor(
-                                product.stock
-                              )}`}
-                            >
-                              {product.stock || 0}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={product.status} />
-                          </TableCell>
+                            {product.price !== product.discountPrice && (
+                              <div className="text-sm text-green-600">
+                                {calculateDiscountPercentage(
+                                  product.price,
+                                  product.discountPrice
+                                )}
+                                % off
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`font-medium ${getStockColor(
+                              product.stock
+                            )}`}
+                          >
+                            {product.stock || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={product.status} />
+                        </TableCell>
 
-                          <TableCell>{product.brand || "N/A"}</TableCell>
-                          <TableCell className="text-nowrap">
-                            <div className="text-sm text-gray-900 flex items-center gap-1 ">
-                              <Calendar className="h-3 w-3 text-gray-400" />
-                              {formatDate(product.createdAt)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end space-x-2">
-                              {/* images  button */}
-                              <Button
-                                onClick={() =>
-                                  navigate(
-                                    `/admin/product-images/${product._id}`
-                                  )
-                                }
-                                variant="ghost"
-                                title="images"
-                                className="text-blue-600  hover:text-blue-900"
-                              >
-                                <Image className="h-4 w-4" />
-                              </Button>
-                              {/* edit button */}
-                              <Button
-                                variant="ghost"
-                                title="Edit Product"
-                                onClick={() =>
-                                  navigate(`/admin/edit-product/${product._id}`)
-                                }
-                                className="text-green-600  hover:text-green-900"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              {/* delete button */}
-                              <ConfirmDelete
-                                onDelete={() =>
-                                  dispatch(deleteProductAction(product?._id))
-                                }
-                              />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                // No products found first time
-                <div className="text-center py-8">
-                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No products yet
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    Get started by creating your first product.
-                  </p>
-                  <Button
-                    onClick={() => navigate("/admin/create-product")}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Your First Product
-                  </Button>
-                </div>
-              )}
+                        <TableCell>{product.brand || "N/A"}</TableCell>
+                        <TableCell className="text-nowrap">
+                          <div className="text-sm text-gray-900 flex items-center gap-1 ">
+                            <Calendar className="h-3 w-3 text-gray-400" />
+                            {formatDate(product.createdAt)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end space-x-2">
+                            {/* images  button */}
+                            <Button
+                              onClick={() =>
+                                navigate(`/admin/product-images/${product._id}`)
+                              }
+                              variant="ghost"
+                              title="images"
+                              className="text-blue-600  hover:text-blue-900"
+                            >
+                              <Image className="h-4 w-4" />
+                            </Button>
+                            {/* edit button */}
+                            <Button
+                              variant="ghost"
+                              title="Edit Product"
+                              onClick={() =>
+                                navigate(`/admin/edit-product/${product._id}`)
+                              }
+                              className="text-green-600  hover:text-green-900"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            {/* delete button */}
+                            <ConfirmDelete
+                              onDelete={() =>
+                                dispatch(deleteProductAction(product?._id))
+                              }
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             {/* show no products found while searching */}

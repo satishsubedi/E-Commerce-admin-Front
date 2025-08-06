@@ -38,7 +38,7 @@ export const getAllUsers = () => {
   return axiosApiCall({
     method: "get",
     url: `${USER_API_URL}/all-users`,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
 
@@ -48,7 +48,7 @@ export const createUser = (userData) => {
     method: "post",
     url: `${USER_API_URL}/register`,
     data: userData,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
 
@@ -58,7 +58,7 @@ export const updateUser = (userId, userData) => {
     method: "patch",
     url: `${USER_API_URL}/update/${userId}`,
     data: userData,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
 
@@ -67,7 +67,7 @@ export const deleteUser = (userId) => {
   return axiosApiCall({
     method: "delete",
     url: `${USER_API_URL}/delete/${userId}`,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
 

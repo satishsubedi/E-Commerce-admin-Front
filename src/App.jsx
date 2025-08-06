@@ -19,6 +19,7 @@ import ProductImagesPage from "./pages/Products/ProductImagesPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PageNotFound from "./pages/pageNotFound/PageNotFound";
 import UnauthorizedPage from "./pages/UnAuthorizedPage/UnauthorizedPage";
+import ReviewPage from "./pages/review/ReviewPage";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="settings" element={<SettingPage />} />
           <Route path="category" element={<CategoryPage />} />
           <Route path="orders" element={<OrdersPage />} />
+          <Route path="reviews" element={<ReviewPage />} />
         </Route>
       </Routes>
       <ToastContainer position="top-center" autoClose={2000} />

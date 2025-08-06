@@ -34,7 +34,6 @@ const LoginForm = () => {
     try {
       //api call
       const response = await loginUser(formData);
-      console.log("Login response:", response);
 
       //destructure response
       const { payload, message, status } = response;
@@ -67,13 +66,6 @@ const LoginForm = () => {
 
   // Logic to handle what should happen if a user is logged in
   const { user } = useSelector((state) => state.user);
-
-  // useEffect(() => {
-  //   // Check if user is already logged in
-  //   if (user?._id) {
-  //     navigate("/admin/dashboard");
-  //   }
-  // }, [user?._id, navigate]);
 
   useEffect(() => {
     // if user exists [logged in], navigate to homepage

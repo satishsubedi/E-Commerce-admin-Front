@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { setCategories } from "./categorySlice";
+import { setCategories, setLoading } from "./categorySlice";
 import {
   addCategory,
   deleteCategory,
@@ -10,9 +10,11 @@ import {
 //Redux Thunk
 //Get Category Action
 export const getCategoryAction = () => async (dispatch) => {
+  dispatch(setLoading(true));
   const response = await getCategoryTree();
 
   if (response?.status == "error") {
+    dispatch(setLoading(false));
     return toast.error(response.message || "Something went wrong!");
   }
   // If the response is successful, dispatch the setcategories action with the category data

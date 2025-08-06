@@ -8,7 +8,6 @@ import {
   Plus,
   Search,
   Shield,
-  Trash2,
   UserCheck,
   UserRoundSearch,
   UserX,
@@ -18,6 +17,7 @@ import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
@@ -91,11 +91,6 @@ const UsersPage = () => {
     setIsCreateDialogOpen(true);
   };
 
-  // // Handle delete user
-  // const handleDeleteUser = (user) => {
-  //   dispatch(deleteUserAction(user._id));
-  // };
-
   // Handle save user (create or update)
   const handleSaveUser = (userData) => {
     // Refresh the users list after save
@@ -121,7 +116,7 @@ const UsersPage = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <PageLoadingSpinner />
+        <PageLoadingSpinner pageName="users" />
       </div>
     );
   }
@@ -135,10 +130,11 @@ const UsersPage = () => {
             <UserRoundSearch className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {" "}
                 User Management
               </h1>
-              <p>Manage your user accounts and permissions</p>
+              <p className="text-sm text-gray-600">
+                Manage your user accounts and permissions
+              </p>
             </div>
           </div>
           <Button
@@ -185,7 +181,8 @@ const UsersPage = () => {
         {/* Users details */}
         <Card>
           <CardHeader>
-            <CardTitle>User List</CardTitle>
+            <CardTitle>User List({filteredUsers.length})</CardTitle>
+            <CardDescription>Manage and moderate user accounts</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4 mb-6">

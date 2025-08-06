@@ -5,6 +5,7 @@ const initialState = {
   user: {},
   users: [],
   isLoading: false,
+  accessJWT: sessionStorage.getItem("accessJWT") || null,
 };
 
 // Create a slice for user-related state management
@@ -21,8 +22,23 @@ const userSlice = createSlice({
       state.users = action.payload;
     },
 
+    setIsLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+    setAccessJWT: (state, action) => {
+      state.accessJWT = action.payload;
+      // Also update sessionStorage when Redux state changes
+      if (action.payload) {
+        sessionStorage.setItem("accessJWT", action.payload);
+      } else {
+        sessionStorage.removeItem("accessJWT");
+      }
+    },
     resetUser: (state) => {
       state.user = {};
+      state.accessJWT = null;
+      // Clear sessionStorage when resetting user
+      sessionStorage.removeItem("accessJWT");
     },
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
@@ -34,5 +50,6 @@ const userSlice = createSlice({
 const { reducer: userReducer, actions } = userSlice;
 
 //destructure actions for easy access
-export const { setUser, setUsers, resetUser, setIsLoading } = actions;
+export const { setUser, setUsers, resetUser, setIsLoading, setAccessJWT } =
+  actions;
 export default userReducer;

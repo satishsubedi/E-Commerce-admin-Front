@@ -8,7 +8,7 @@ import {
   updateUser,
 } from "../../axios/userAxios";
 import { toast } from "react-toastify";
-import { setUser, setUsers } from "./userSlice";
+import { resetUser, setAccessJWT, setUser, setUsers } from "./userSlice";
 
 //Redux Thunk
 // GET USER ACTION
@@ -30,7 +30,7 @@ export const getAllUsersAction = () => async (dispatch) => {
   const response = await getAllUsers();
 
   if (response?.status == "error") {
-    toast.error(response.message || "Error getting users!");
+    toast.error(response?.message || "Error getting users!");
     return response;
   }
   // If the response is successful, dispatch the setUser action with the user data
@@ -65,7 +65,6 @@ export const createUserAction = (formData) => async (dispatch) => {
 export const updateUserAction = (userId, formData) => async (dispatch) => {
   try {
     const response = await updateUser(userId, formData);
-    console.log("Update Response:", response);
 
     if (response?.status === "error") {
       toast.error(response.message || "Error updating user!");
@@ -119,7 +118,7 @@ export const logoutUserAction = (email) => async (dispatch) => {
       localStorage.removeItem("refreshJWT");
 
       // clear state
-      dispatch(setUser({}));
+      dispatch(resetUser({}));
       toast.success(response.message);
       return response;
     }
@@ -140,14 +139,19 @@ export const autoLoginAction = () => async (dispatch) => {
     const response = await getNewAccessJwt();
 
     if (response?.status === "success") {
-      sessionStorage.setItem("accessJWT", response.payload.accessJWT);
+      const newToken = response.payload.accessJWT;
 
+      // Update Redux state with new access token
+      dispatch(setAccessJWT(newToken));
+
+      // Fetch user data after getting new access token
       dispatch(getUserAction());
       return;
     }
   }
-  //  Have accessJWT - validate it by getting user
+  // Have accessJWT - validate it by getting user
   if (accessJWT) {
+    dispatch(setAccessJWT(accessJWT));
     dispatch(getUserAction());
     return;
   }

@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CategoryForm from "./CategoryForm";
+import ConfirmDelete from "../helper/ConfirmDelete";
 
 const RecursiveCategory = (props) => {
   // Destructuring props
@@ -112,14 +113,15 @@ const RecursiveCategory = (props) => {
           >
             <Edit className="h-3 w-3" />
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             title="Delete Category"
             className="h-8 text-red-600 hover:text-red-700"
             onClick={() => handleDeleteCategory(category._id)}
           >
             <Trash2 className="h-3 w-3" />
-          </Button>
+          </Button> */}
+          <ConfirmDelete onDelete={() => handleDeleteCategory(category._id)} />
         </div>
       </div>
       {/* Add/Edit Subcategory Form */}

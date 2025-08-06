@@ -7,6 +7,7 @@ export const getAllProducts = () => {
   return axiosApiCall({
     method: "get",
     url: USER_API_URL,
+    isPrivate: true,
   });
 };
 
@@ -15,6 +16,7 @@ export const getProduct = (productId) => {
   return axiosApiCall({
     method: "get",
     url: `${USER_API_URL}/Id/${productId}`,
+    isPrivate: true,
   });
 };
 
@@ -24,7 +26,7 @@ export const addProduct = (productData) => {
     method: "post",
     url: `${USER_API_URL}/addProduct`,
     data: productData,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
 
@@ -43,6 +45,7 @@ export const deleteProduct = (productId) => {
   return axiosApiCall({
     method: "delete",
     url: `${USER_API_URL}/deleteProducts/${productId}`,
+    isPrivate: true,
   });
 };
 // ADD images | POST | PRIVATE
@@ -51,6 +54,6 @@ export const addProductImages = (productId, productObj) => {
     method: "post",
     url: `${USER_API_URL}/addProductImages/${productId}`,
     data: productObj,
-    // isPrivate: true,
+    isPrivate: true,
   });
 };
