@@ -28,7 +28,7 @@ const OrdersPage = () => {
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, loading, error } = useSelector((state) => state.orders);
 
-  // console.log("Orders State:", orders);
+  console.log("Orders State:", orders);
 
   const filter = searchParams.get("filter") || "All";
   const startDateParam = searchParams.get("startDate");
@@ -266,8 +266,16 @@ const OrdersPage = () => {
                                   "Guest"}
                             </TableCell>
                             <TableCell className="flex flex-col">
-                              <div>{order.customerEmail || "N/A"}</div>
-                              <div>{order.customerPhone || "N/A"}</div>
+                              <div>
+                                {order.guestInfo?.email ||
+                                  order.buyer?.email ||
+                                  "N/A"}
+                              </div>
+                              <div>
+                                {order?.guestInfo?.phoneNumber ||
+                                  order.buyer?.phone ||
+                                  "N/A"}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <span className="font-medium">
