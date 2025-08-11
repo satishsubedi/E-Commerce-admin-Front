@@ -55,7 +55,13 @@ const ForgotPasswordPage = () => {
   // if success then only show this card
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex flex-col">
+        {/* This is header part */}
+        <header className="bg-gray-900 text-white p-4 shadow-md flex justify-between items-center">
+          <h1 className="text-xl font-bold">Admin Panel</h1>
+          <span className="text-sm opacity-80">Secure Login</span>
+        </header>
+        {/* This is main card  */}
         <Card className="w-full max-w-md mx-auto shadow-lg rounded-2xl overflow-hidden border-0">
           <CardHeader className="bg-green-600 p-8 text-center">
             <div className="flex justify-center mb-4">
@@ -105,12 +111,23 @@ const ForgotPasswordPage = () => {
             </Button>
           </CardFooter>
         </Card>
+        {/* This is footer  */}
+        <footer className="w-full bg-gray-100 text-gray-600 text-center py-4 border-t text-sm">
+          © {new Date().getFullYear()} Internship Group Project. All rights
+          reserved.
+        </footer>
       </div>
     );
   }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 p-4">
-      <Card className="w-full max-w-md mx-auto shadow-xl rounded-xl overflow-hidden border-0">
+    <div className="min-h-screen flex flex-col">
+      {/* This is header  */}
+      <header className="bg-gray-900 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 className="text-xl font-bold">Admin Panel</h1>
+        <span className="text-sm opacity-80">Secure Login</span>
+      </header>
+      {/* This is main card  */}
+      <Card className="w-full max-w-md mx-auto shadow-xl rounded-xl border-0 h-[84vh]">
         <CardHeader className="bg-green-600 p-6 text-center">
           <Key className="w-8 h-8 mx-auto text-white" strokeWidth={2} />
           <CardTitle className="text-2xl font-bold text-white mt-2">
@@ -118,7 +135,7 @@ const ForgotPasswordPage = () => {
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6">
           <div className="text-center mb-2">
             <p className="text-sm text-muted-foreground">
               Enter your email to receive a reset link
@@ -127,7 +144,7 @@ const ForgotPasswordPage = () => {
 
           <form
             onSubmit={handleOnSubmit}
-            className="space-y-4"
+            className="space-y-4 mt-5 gap-4"
             autoComplete="on"
           >
             {ForgotPasswordFormControls.map((field, index) => (
@@ -187,6 +204,11 @@ const ForgotPasswordPage = () => {
           </div>
         </CardContent>
       </Card>
+      {/* This is footer  */}
+      <footer className="w-full bg-gray-100 text-gray-600 text-center py-4 border-t text-sm">
+        © {new Date().getFullYear()} Internship Group Project. All rights
+        reserved.
+      </footer>
     </div>
   );
 };
