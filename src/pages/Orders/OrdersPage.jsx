@@ -244,7 +244,7 @@ const OrdersPage = () => {
                         {filteredOrders.map((order, index) => (
                           <TableRow
                             key={order._id}
-                            className="hover:bg-gray-50"
+                            className="hover:bg-gray-100"
                           >
                             <TableCell>{index + 1}</TableCell>
                             <TableCell className="font-medium">
@@ -331,13 +331,9 @@ const OrdersPage = () => {
                               </select>
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </Button>
+                              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md hover:cursor-pointer">
+                                View
+                              </button>
                             </TableCell>
                           </TableRow>
                         ))}

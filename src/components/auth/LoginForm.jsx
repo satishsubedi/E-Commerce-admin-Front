@@ -87,7 +87,7 @@ const LoginForm = () => {
   }, [user?._id, navigate, dispatch]);
 
   return (
-    <div className="flex flex-col justify-center px-10 md:px-20">
+    <div className="flex flex-col justify-center px-10 md:px-20 h-[84vh] bg-white/10 backdrop-blur-md border border-white/30 rounded-lg shadow-lg max-w-md mx-auto">
       <div className="space-y-6 max-w-md mx-auto w-full">
         <div>
           <h2 className="text-2xl font-bold">Welcome back!</h2>
