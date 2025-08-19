@@ -26,6 +26,7 @@ export const getDashboardData = () => {
     method: "get",
     url: `${ORDER_API_URL}/dashboard`,
     isPrivate: true,
+
   });
 };
 
@@ -35,5 +36,6 @@ export const getTopProduct = () => {
     method: "get",
     url: `${ORDER_API_URL}/top-products`,
     isPrivate: true,
+
   });
 };
