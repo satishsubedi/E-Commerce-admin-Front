@@ -19,6 +19,7 @@ import {
   getOrderAction,
   updateOrderStatusAction,
 } from "../../redux/order/orderAction";
+import getCustomerName from "../../utils/GetCustomerName";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -247,24 +248,10 @@ const OrdersPage = () => {
                             className="hover:bg-gray-100"
                           >
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell className="font-medium">
-                              {order._id.slice(-6)}
+                            <TableCell className="font-medium text-blue-600">
+                              #{order._id.slice(-6)}
                             </TableCell>
-                            <TableCell>
-                              {order.isGuest
-                                ? order.guestInfo?.firstName ||
-                                  order.guestInfo?.lastName
-                                  ? `${order.guestInfo.firstName || ""} ${
-                                      order.guestInfo.lastName || ""
-                                    }`.trim()
-                                  : order.guestInfo?.email ||
-                                    order.customerName ||
-                                    "Guest"
-                                : order.customerName ||
-                                  order.buyer?.email ||
-                                  order.customerEmail ||
-                                  "Guest"}
-                            </TableCell>
+                            <TableCell>{getCustomerName(order)}</TableCell>
                             <TableCell className="flex flex-col">
                               <div>
                                 {order.guestInfo?.email ||

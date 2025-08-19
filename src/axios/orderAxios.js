@@ -26,5 +26,16 @@ export const getDashboardData = () => {
     method: "get",
     url: `${ORDER_API_URL}/dashboard`,
     isPrivate: true,
+
+  });
+};
+
+//get top product
+export const getTopProduct = () => {
+  return axiosApiCall({
+    method: "get",
+    url: `${ORDER_API_URL}/top-products`,
+    isPrivate: true,
+
   });
 };

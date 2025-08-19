@@ -26,6 +26,10 @@ import PageLoadingSpinner from "../../components/helper/PageLoadingSpinner";
 import { getDashboardData } from "../../axios/orderAxios";
 import StatsCard from "../../components/helper/StatsCard";
 
+
+import RecentOrderAndTopProduct from "./RecentOrderAndTopProduct";
+
+
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
 const DashboardPage = () => {
@@ -222,6 +226,11 @@ const DashboardPage = () => {
               </CardContent>
             </Card>
           </div>
+
+
+          {/* recent  order and top product */}
+          <RecentOrderAndTopProduct />
+
         </main>
       </div>
     </div>

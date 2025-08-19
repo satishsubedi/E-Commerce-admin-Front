@@ -17,7 +17,7 @@ const ConfirmDelete = ({
   onDelete,
   triggerButton = (
     <Button
-      variant="ghost"
+      variant="outline"
       title="Delete"
       className="text-red-600 hover:text-red-700"
     >
