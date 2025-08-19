@@ -26,7 +26,9 @@
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dialog": "^0.3.1",
     "dotenv": "^16.5.0",
+    "input": "^1.0.1",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.511.0",
@@ -42,6 +44,7 @@
     "recharts": "^3.1.2",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
+    "textarea": "^0.3.0",
     "tsparticles": "^3.9.1"
   },
   "devDependencies": {

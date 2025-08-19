@@ -39,3 +39,23 @@ export const getTopProduct = () => {
 
   });
 };
+
+//This is for adding notes to specific order
+export const orderNote = (orderId, note) => {
+  return axiosApiCall({
+    method: "patch",
+    url: `${ORDER_API_URL}/orders/${orderId}/note`,
+    data: { note },
+    isPrivate: true,
+  });
+};
+
+//This is for sending the note abut order
+export const sendOrderNoteEmail = (orderId, note) => {
+  return axiosApiCall({
+    method: "post",
+    url: `${ORDER_API_URL}/orders/${orderId}/send-note-email`,
+    data: { note },
+    isPrivate: true,
+  });
+};

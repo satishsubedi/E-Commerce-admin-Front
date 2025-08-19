@@ -16,39 +16,52 @@ import OrderPDFDownloader from "../../components/helper/OrderPDFDownloader";
 import { ShoppingCart } from "lucide-react";
 import FilterSelect from "../../components/helper/FilterSelect";
 import {
+  addOrderNoteAction,
   getOrderAction,
+  sendOrderNoteEmailAction,
   updateOrderStatusAction,
 } from "../../redux/order/orderAction";
+
 import getCustomerName from "../../utils/GetCustomerName";
+
+import OrderDetailsDialog from "../../components/helper/OrderDetailsDialog";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-
+  //This is for updating the orders
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, loading, error } = useSelector((state) => state.orders);
 
-  console.log("Orders State:", orders);
-
+  //This is for filtering the orders
   const filter = searchParams.get("filter") || "All";
   const startDateParam = searchParams.get("startDate");
   const endDateParam = searchParams.get("endDate");
 
   const [statusFilter, setStatusFilter] = useState(filter);
   const [dateFilter, setDateFilter] = useState({
-    startDate: new Date("2025-01-01T00:00:00"), // or earliest order date
-    endDate: new Date("2030-12-31T23:59:59"), // or latest order date
+    startDate: new Date("2025-01-01T00:00:00"),
+    endDate: new Date("2030-12-31T23:59:59"),
   });
 
+  //This is for order view
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [notes, setNotes] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  //This is for getting the orders
   useEffect(() => {
     dispatch(getOrderAction());
   }, [dispatch]);
 
+  //This is for fitering the orders
   useEffect(() => {
     if (filter) setStatusFilter(filter);
   }, [filter]);
 
+  //This is for status change
   const handleStatusChange = async (orderId, newStatus, statusType) => {
     setUpdatingOrders((prev) => ({
       ...prev,
@@ -71,8 +84,7 @@ const OrdersPage = () => {
         [orderId]: { ...prev[orderId], [statusType]: false },
       }));
     }
-  };
-
+  }; //This is for filtering the orders
   const filteredOrders =
     orders?.filter((order) => {
       const createdAt = new Date(order.createdAt);
@@ -88,6 +100,7 @@ const OrdersPage = () => {
     return date.toISOString().split("T")[0];
   };
 
+  //Payment status order
   const getStatusColor = (status, type = "order") => {
     if (type === "payment") {
       switch (status) {
@@ -105,6 +118,7 @@ const OrdersPage = () => {
           return "bg-gray-100 text-gray-800";
       }
     } else {
+      //This is order status
       switch (status) {
         case "Delivered":
           return "bg-green-100 text-green-800";
@@ -121,7 +135,36 @@ const OrdersPage = () => {
       }
     }
   };
+  //This is for handling view order
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setNotes(order.orderNotes || "");
+    setIsModalOpen(true);
+  };
+  //This is for adding the notes
+  const handleAddNote = async () => {
+    if (!selectedOrder) return;
+    await dispatch(addOrderNoteAction(selectedOrder._id, notes));
+    if (!error) {
+      setIsModalOpen(false);
+    }
+  };
 
+  //This is sending email
+  const sendEmail = async () => {
+    try {
+      setSendingEmail(true);
+      await dispatch(sendOrderNoteEmailAction(selectedOrder._id, notes));
+      alert("Email sent!");
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send email");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+  console.log(selectedOrder, "Selected order");
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className=" max-w-7xl mx-auto space-y-4">
@@ -318,14 +361,27 @@ const OrdersPage = () => {
                               </select>
                             </TableCell>
                             <TableCell className="text-right">
-                              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md hover:cursor-pointer">
+                              <Button
+                                onClick={() => handleViewOrder(order)}
+                                className="bg-blue-700"
+                              >
                                 View
-                              </button>
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                    <OrderDetailsDialog
+                      isOpen={isModalOpen}
+                      onOpenChange={setIsModalOpen}
+                      order={selectedOrder}
+                      notes={notes}
+                      setNotes={setNotes}
+                      sendEmail={sendEmail}
+                      sendingEmail={sendingEmail}
+                      addNote={handleAddNote}
+                    />
                   </div>
                 )}
               </div>
