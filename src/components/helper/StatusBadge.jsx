@@ -2,15 +2,16 @@ import { Clock, CheckCircle, XCircle } from "lucide-react";
 
 const StatusBadge = ({ status, type = "product" }) => {
   const productColors = {
-    active: "bg-green-100 text-green-800 border-green-200",
-    inactive: "bg-purple-100 text-purple-800 border-purple-200",
-    "out-of-stock": "bg-red-100 text-red-700 border-red-300",
+    active: "bg-green-100 text-green-800 border-green-300",
+    inactive: "bg-gray-100 text-gray-800 border-gray-300",
+    "out-of-stock": "bg-red-100 text-red-800 border-red-300",
+    expired: "bg-red-100 text-red-700 border-red-300",
   };
 
   const reviewColors = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    approved: "bg-green-100 text-green-800 border-green-200",
-    rejected: "bg-red-100 text-red-700 border-red-200",
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    approved: "bg-green-100 text-green-800 border-green-300",
+    rejected: "bg-red-100 text-red-700 border-red-300",
   };
 
   const colors = type === "review" ? reviewColors : productColors;

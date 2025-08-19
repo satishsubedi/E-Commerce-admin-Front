@@ -234,3 +234,41 @@ export const initialCategoryState = {
   parentId: null,
   showForm: false,
 };
+
+//initial coupon form
+export const initialCouponFormData = {
+  code: "",
+  value: "",
+  expiryDate: "",
+  usageLimit: "",
+};
+
+//coupon form controls
+export const CouponFormControls = [
+  {
+    name: "code",
+    label: "Coupon Code*",
+    type: "text",
+    placeholder: "e.g., SAVE20",
+  },
+
+  {
+    name: "value",
+    label: "Coupon Value*",
+    type: "number",
+    placeholder: "e.g., 20",
+  },
+
+  {
+    name: "expiryDate",
+    label: "Expiry Date*",
+    type: "date",
+    placeholder: "Enter  expiry date",
+  },
+  {
+    name: "usageLimit",
+    label: "Usage Limit*",
+    type: "number",
+    placeholder: "e.g., 100",
+  },
+];
