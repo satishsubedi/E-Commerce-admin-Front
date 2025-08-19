@@ -40,6 +40,17 @@ const orderSlice = createSlice({
           : order
       );
     },
+    updateOrderNote: (state, action) => {
+      const { orderId, note } = action.payload;
+      state.orders = state.orders.map((order) =>
+        order._id === orderId
+          ? {
+              ...order,
+              orderNotes: note,
+            }
+          : order
+      );
+    },
   },
 });
 
@@ -49,6 +60,7 @@ export const {
   setOrderError,
   resetOrders,
   updateOrderStatus,
+  updateOrderNote,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
