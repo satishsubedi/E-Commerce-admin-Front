@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -9,10 +12,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
 const FormControl = (props) => {
-  const { label, inputAttributes, handleOnChange, options = [] } = props;
+  const {
+    label,
+    inputAttributes,
+    handleOnChange,
+    options = [],
+    isPassword = false,
+    showPassword,
+    setShowPassword,
+  } = props;
+
+  // password field with toggle
+  if (isPassword) {
+    return (
+      <div className="mb-4">
+        <Label
+          htmlFor={inputAttributes.id}
+          className="block text-sm font-bold mb-2"
+        >
+          {label}
+        </Label>
+        <div className="relative">
+          <Input
+            {...inputAttributes}
+            type={showPassword ? "text" : "password"}
+            value={inputAttributes.value || ""}
+            onChange={(e) => handleOnChange(e)}
+            className="w-full p-3 border rounded-sm shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+          />
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   //use when we need to select a value from a list
   if (inputAttributes.type === "select") {

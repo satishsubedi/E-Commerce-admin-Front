@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import getCustomerName from "../../utils/GetCustomerName";
+import formatDate from "../../utils/FormatDate";
 
 export default function OrderDetailsDialog({
   isOpen,
@@ -32,12 +34,16 @@ export default function OrderDetailsDialog({
         {order && (
           <div className="space-y-4">
             {/* Order Info */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-4 rounded-lg ml-1">
               <p>
                 <strong>Order ID:</strong> #{order._id.slice(-6)}
               </p>
               <p>
-                <strong>Customer:</strong> {order.customerName || "Guest"}
+                <strong>Order Date:</strong>
+                {formatDate(order?.createdAt)}
+              </p>
+              <p>
+                <strong>Customer:</strong> {getCustomerName(order)}
               </p>
               <p>
                 <strong>Email:</strong>{" "}
@@ -46,6 +52,14 @@ export default function OrderDetailsDialog({
               <p>
                 <strong>Phone:</strong>{" "}
                 {order.guestInfo?.phoneNumber || order.buyer?.phone || "N/A"}
+              </p>
+              <p>
+                <strong>Address:</strong>
+                <span className="ml-1">{order.shippingAddresses?.street},</span>
+                <span className="ml-1">{order.shippingAddresses?.city}</span>
+                <span className="ml-1">{order.shippingAddresses?.zip}</span>
+                <span className="ml-1">{order.shippingAddresses?.state}</span>
+                <span className="ml-1">{order.shippingAddresses?.country}</span>
               </p>
             </div>
 
@@ -60,20 +74,20 @@ export default function OrderDetailsDialog({
                   >
                     {/* Thumbnail */}
                     <img
-                      src={item.productId.thumbnail || "/placeholder.png"}
-                      alt={item.productId.title}
+                      src={item?.productId?.thumbnail || "/placeholder.png"}
+                      alt={item.productId?.title || "Product"}
                       className="w-16 h-16 object-cover rounded border"
                     />
 
                     {/* Product Info */}
                     <div className="flex-1">
-                      <p className="font-medium">{item.productId.title}</p>
+                      <p className="font-medium">{item.productId?.title}</p>
                       <p className="text-sm text-gray-500">
-                        ID: {item.productId._id}
+                        SKU: {item.productId?._id.slice(-20)}
                       </p>
                       <p className="text-sm text-gray-500">
                         Quantity:{" "}
-                        <span className="font-semibold">{item.quantity}</span>
+                        <span className="font-semibold">{item?.quantity}</span>
                       </p>
                     </div>
 

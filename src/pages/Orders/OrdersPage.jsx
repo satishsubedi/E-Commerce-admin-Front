@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { useLocation } from "react-router-dom";
 import OrderPDFDownloader from "../../components/helper/OrderPDFDownloader";
-import { ShoppingCart } from "lucide-react";
+import { Eye, ShoppingCart } from "lucide-react";
 import FilterSelect from "../../components/helper/FilterSelect";
 import {
   addOrderNoteAction,
@@ -21,10 +20,10 @@ import {
   sendOrderNoteEmailAction,
   updateOrderStatusAction,
 } from "../../redux/order/orderAction";
-
 import getCustomerName from "../../utils/GetCustomerName";
-
-import OrderDetailsDialog from "../../components/helper/OrderDetailsDialog";
+import OrderDetailsDialog from "./OrderDetailsDialog";
+import formatDate from "../../utils/FormatDate";
+import getStatusColor from "../../components/helper/orderStatusColor";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -34,7 +33,9 @@ const OrdersPage = () => {
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, loading, error } = useSelector((state) => state.orders);
 
-  //This is for filtering the orders
+  console.log("Orders:", orders);
+
+  //This is for filtering the   orders
   const filter = searchParams.get("filter") || "All";
   const startDateParam = searchParams.get("startDate");
   const endDateParam = searchParams.get("endDate");
@@ -95,46 +96,11 @@ const OrdersPage = () => {
       return isWithinDateRange && matchesStatus;
     }) || [];
 
-  const formatDate = (date) => {
+  const formatDates = (date) => {
     if (!date || isNaN(date.getTime())) return "";
     return date.toISOString().split("T")[0];
   };
 
-  //Payment status order
-  const getStatusColor = (status, type = "order") => {
-    if (type === "payment") {
-      switch (status) {
-        case "Paid":
-          return "bg-green-100 text-green-800";
-        case "Processing":
-          return "bg-blue-100 text-blue-800";
-        case "Pending":
-          return "bg-yellow-100 text-yellow-800";
-        case "Failed":
-          return "bg-red-100 text-red-800";
-        case "Refunded":
-          return "bg-purple-100 text-purple-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
-    } else {
-      //This is order status
-      switch (status) {
-        case "Delivered":
-          return "bg-green-100 text-green-800";
-        case "On The Way":
-          return "bg-blue-100 text-blue-800";
-        case "Dispatched":
-          return "bg-yellow-100 text-yellow-800";
-        case "Order Placed":
-          return "bg-orange-100 text-orange-800";
-        case "Processing":
-          return "bg-purple-100 text-purple-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
-    }
-  };
   //This is for handling view order
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
@@ -164,7 +130,6 @@ const OrdersPage = () => {
       setSendingEmail(false);
     }
   };
-  console.log(selectedOrder, "Selected order");
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className=" max-w-7xl mx-auto space-y-4">
@@ -215,8 +180,8 @@ const OrdersPage = () => {
             </label>
             <input
               type="date"
-              value={formatDate(dateFilter.startDate)}
-              max={formatDate(dateFilter.endDate)}
+              value={formatDates(dateFilter.startDate)}
+              max={formatDates(dateFilter.endDate)}
               onChange={(e) =>
                 setDateFilter((prev) => ({
                   ...prev,
@@ -231,8 +196,8 @@ const OrdersPage = () => {
             <label className="block text-sm font-semibold mb-1">End Date</label>
             <input
               type="date"
-              value={formatDate(dateFilter.endDate)}
-              min={formatDate(dateFilter.startDate)}
+              value={formatDates(dateFilter.endDate)}
+              min={formatDates(dateFilter.startDate)}
               onChange={(e) =>
                 setDateFilter((prev) => ({
                   ...prev,
@@ -255,7 +220,7 @@ const OrdersPage = () => {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>Order List</CardTitle>
+              <CardTitle>Order List({filteredOrders.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border">
@@ -279,6 +244,7 @@ const OrdersPage = () => {
                           <TableHead>CUSTOMER</TableHead>
                           <TableHead>CONTACT</TableHead>
                           <TableHead>TOTAL</TableHead>
+                          <TableHead>ORDER DATE</TableHead>
                           <TableHead>ORDER STATUS</TableHead>
                           <TableHead>PAYMENT STATUS</TableHead>
                           <TableHead className="text-right">ACTIONS</TableHead>
@@ -291,7 +257,10 @@ const OrdersPage = () => {
                             className="hover:bg-gray-100"
                           >
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell className="font-medium text-blue-600">
+                            <TableCell
+                              className="font-medium text-blue-600 underline hover:cursor-pointer"
+                              onClick={() => handleViewOrder(order)}
+                            >
                               #{order._id.slice(-6)}
                             </TableCell>
                             <TableCell>{getCustomerName(order)}</TableCell>
@@ -312,6 +281,7 @@ const OrdersPage = () => {
                                 $ {order.totalAmount.toFixed(2)}
                               </span>
                             </TableCell>
+                            <TableCell>{formatDate(order.createdAt)}</TableCell>
                             <TableCell>
                               <select
                                 className={`border rounded px-2 py-1 text-sm ${getStatusColor(
@@ -362,10 +332,12 @@ const OrdersPage = () => {
                             </TableCell>
                             <TableCell className="text-right">
                               <Button
+                                variant="outline"
+                                title="View Details"
                                 onClick={() => handleViewOrder(order)}
-                                className="bg-blue-700"
+                                className="text-blue-600  hover:text-blue-900"
                               >
-                                View
+                                <Eye className="h-4 w-4" />
                               </Button>
                             </TableCell>
                           </TableRow>

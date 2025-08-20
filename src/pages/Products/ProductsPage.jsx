@@ -290,7 +290,7 @@ const ProductsPage = () => {
                               onClick={() =>
                                 navigate(`/admin/product-images/${product._id}`)
                               }
-                              variant="ghost"
+                              variant="outline"
                               title="images"
                               className="text-blue-600  hover:text-blue-900"
                             >
@@ -298,7 +298,7 @@ const ProductsPage = () => {
                             </Button>
                             {/* edit button */}
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               title="Edit Product"
                               onClick={() =>
                                 navigate(`/admin/edit-product/${product._id}`)

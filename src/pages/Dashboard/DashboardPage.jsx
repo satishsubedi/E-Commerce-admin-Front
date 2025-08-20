@@ -21,18 +21,33 @@ import {
   Package,
   LayoutDashboard,
   Users,
+  LogOut,
+  Settings,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import PageLoadingSpinner from "../../components/helper/PageLoadingSpinner";
 import { getDashboardData } from "../../axios/orderAxios";
 import StatsCard from "../../components/helper/StatsCard";
-
-
 import RecentOrderAndTopProduct from "./RecentOrderAndTopProduct";
-
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logoutUserAction } from "../../redux/user/userAction";
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { user } = useSelector((state) => state.user);
+
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
@@ -47,6 +62,12 @@ const DashboardPage = () => {
     };
     fetchDashboardData();
   }, []);
+
+  //function to handle logout
+  const handleLogout = async () => {
+    dispatch(logoutUserAction(user?.email));
+    navigate("/login");
+  };
 
   if (!dashboardData)
     return (
@@ -78,15 +99,39 @@ const DashboardPage = () => {
                 <h2 className="text-2xl font-bold text-gray-900">
                   Admin Dashboard
                 </h2>
-                <p className="text-gray-600 mt-2 text-sm">
-                  Welcome back! Here's what's happening with your store.
+                <p className="text-gray-600 mt-2 ">
+                  Welcome back!! ,
+                  <span className="font-bold m-2">
+                    {user?.fName.toUpperCase()}
+                  </span>
                 </p>
               </div>
             </div>
 
-            <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">MK</span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold hover:cursor-pointer">
+                  {user?.fName?.charAt(0)?.toUpperCase() +
+                    user?.lName?.charAt(0)?.toUpperCase() || "NA"}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48" align="end">
+                <DropdownMenuLabel>
+                  {user?.fName.toUpperCase().charAt(0) + user?.fName.slice(1)}{" "}
+                  {user?.lName.toUpperCase().charAt(0) + user?.lName.slice(1)}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={() => navigate("/admin/settings")}>
+                  <Settings className="mr-1" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-1" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
@@ -100,7 +145,6 @@ const DashboardPage = () => {
               icon={DollarSign}
               color="text-blue-600"
               bgColor="bg-blue-50"
-              secondaryText="+12% from last month"
             />
             <StatsCard
               label="Total Orders"
@@ -108,7 +152,6 @@ const DashboardPage = () => {
               icon={ShoppingBag}
               color="text-blue-600"
               bgColor="bg-blue-50"
-              secondaryText="+8% from last month"
             />
             <StatsCard
               label="Active Users"
@@ -116,7 +159,6 @@ const DashboardPage = () => {
               icon={Users}
               color="text-blue-600"
               bgColor="bg-blue-50"
-              secondaryText="+5% from last month"
             />
             <StatsCard
               label=" Total Products"
@@ -124,7 +166,6 @@ const DashboardPage = () => {
               icon={Package}
               color="text-blue-600"
               bgColor="bg-blue-50"
-              secondaryText="+5% from last month"
             />
           </div>
 
@@ -174,7 +215,7 @@ const DashboardPage = () => {
             {/* User Type Pie Chart */}
             <Card className="shadow-md">
               <CardHeader>
-                <CardTitle>user Type</CardTitle>
+                <CardTitle>User Type</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={250}>
@@ -227,10 +268,8 @@ const DashboardPage = () => {
             </Card>
           </div>
 
-
           {/* recent  order and top product */}
           <RecentOrderAndTopProduct />
-
         </main>
       </div>
     </div>
