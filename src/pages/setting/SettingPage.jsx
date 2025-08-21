@@ -54,27 +54,44 @@ const SettingPage = () => {
     profilePicture: user?.profilePicture || null,
   });
 
-  const [originalData] = useState({ ...formData });
+  const [originalData, setOriginalData] = useState({ ...formData });
 
   // handleSave function
   const handleSave = async () => {
+    if (!formData.password && formData.confirmPassword) {
+      toast.error("Please enter your new password as well.");
+      return;
+    }
     // Validate passwords match if changing password
     if (formData.password && formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match. Please check and try again.");
+      toast.error("Passwords do not match or confirm password is empty.");
       return;
     }
 
     startLoading();
 
     try {
-      const response = await dispatch(updateUserAction(user._id, formData));
+      // Create a copy of formData  to send to server without confirmPassword
+      const { confirmPassword, ...dataToSend } = formData;
+
+      const response = await dispatch(updateUserAction(user._id, dataToSend));
       if (response.status === "success") {
         stopLoading();
         toast.success("Settings updated successfully");
       }
+      // Update the original data and reset password fields
+      const updatedFormData = {
+        ...formData,
+        password: "",
+        confirmPassword: "",
+      };
+      setFormData(updatedFormData);
+      setOriginalData(updatedFormData);
     } catch (error) {
       stopLoading();
-      toast.error("Failed to update settings");
+      toast.error(
+        error?.response?.data?.message || "Failed to update settings"
+      );
     }
   };
 
