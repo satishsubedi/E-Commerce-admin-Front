@@ -10,6 +10,7 @@ export const axiosApiCall = async (axiosParams) => {
     data,
     isPrivate = false,
     useRefreshToken = false,
+    onUploadProgress,
   } = axiosParams;
 
   // Get token from Redux state first, fallback to sessionStorage
@@ -35,6 +36,7 @@ export const axiosApiCall = async (axiosParams) => {
       url,
       data,
       headers,
+      onUploadProgress,
     });
 
     if (response.data.status === "error") {

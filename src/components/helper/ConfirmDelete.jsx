@@ -17,7 +17,7 @@ const ConfirmDelete = ({
   onDelete,
   triggerButton = (
     <Button
-      variant="ghost"
+      variant="outline"
       title="Delete"
       className="text-red-600 hover:text-red-700"
     >
@@ -37,7 +37,12 @@ const ConfirmDelete = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={onDelete}
+            className="bg-red-500 hover:bg-red-700  "
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

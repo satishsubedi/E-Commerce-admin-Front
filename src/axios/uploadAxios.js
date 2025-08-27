@@ -8,13 +8,28 @@ export const uploadMedia = (FormData, onProgressCallBack) => {
     method: "post",
     url: USER_API_URL,
     data: FormData,
-    //to show  upload progress
     onUploadProgress: (progressEvent) => {
-      const progressCompleted = Math.round(
+      const percent = Math.round(
         (progressEvent.loaded * 100) / progressEvent.total
       );
+
+      // Simulate smoother progress for small files
       if (onProgressCallBack) {
-        onProgressCallBack(progressCompleted);
+        if (percent === 100) {
+          // fake gradual fill for UX
+          let current = 90;
+          const interval = setInterval(() => {
+            current += 2;
+            if (current >= 100) {
+              clearInterval(interval);
+              onProgressCallBack(100);
+            } else {
+              onProgressCallBack(current);
+            }
+          }, 50);
+        } else {
+          onProgressCallBack(percent);
+        }
       }
     },
   });

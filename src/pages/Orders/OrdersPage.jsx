@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,44 +10,59 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { useLocation } from "react-router-dom";
 import OrderPDFDownloader from "../../components/helper/OrderPDFDownloader";
-import { ShoppingCart } from "lucide-react";
+import { Eye, ShoppingCart } from "lucide-react";
 import FilterSelect from "../../components/helper/FilterSelect";
 import {
+  addOrderNoteAction,
   getOrderAction,
+  sendOrderNoteEmailAction,
   updateOrderStatusAction,
 } from "../../redux/order/orderAction";
+import getCustomerName from "../../utils/GetCustomerName";
+import OrderDetailsDialog from "./OrderDetailsDialog";
+import formatDate from "../../utils/FormatDate";
+import getStatusColor from "../../components/helper/orderStatusColor";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-
+  //This is for updating the orders
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, loading, error } = useSelector((state) => state.orders);
 
-  // console.log("Orders State:", orders);
+  console.log("Orders:", orders);
 
+  //This is for filtering the   orders
   const filter = searchParams.get("filter") || "All";
   const startDateParam = searchParams.get("startDate");
   const endDateParam = searchParams.get("endDate");
 
   const [statusFilter, setStatusFilter] = useState(filter);
   const [dateFilter, setDateFilter] = useState({
-    startDate: new Date("2025-01-01T00:00:00"), // or earliest order date
-    endDate: new Date("2030-12-31T23:59:59"), // or latest order date
+    startDate: new Date("2025-01-01T00:00:00"),
+    endDate: new Date("2030-12-31T23:59:59"),
   });
 
+  //This is for order view
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [notes, setNotes] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  //This is for getting the orders
   useEffect(() => {
     dispatch(getOrderAction());
   }, [dispatch]);
 
+  //This is for fitering the orders
   useEffect(() => {
     if (filter) setStatusFilter(filter);
   }, [filter]);
 
+  //This is for status change
   const handleStatusChange = async (orderId, newStatus, statusType) => {
     setUpdatingOrders((prev) => ({
       ...prev,
@@ -70,8 +85,7 @@ const OrdersPage = () => {
         [orderId]: { ...prev[orderId], [statusType]: false },
       }));
     }
-  };
-
+  }; //This is for filtering the orders
   const filteredOrders =
     orders?.filter((order) => {
       const createdAt = new Date(order.createdAt);
@@ -82,45 +96,40 @@ const OrdersPage = () => {
       return isWithinDateRange && matchesStatus;
     }) || [];
 
-  const formatDate = (date) => {
+  const formatDates = (date) => {
     if (!date || isNaN(date.getTime())) return "";
     return date.toISOString().split("T")[0];
   };
 
-  const getStatusColor = (status, type = "order") => {
-    if (type === "payment") {
-      switch (status) {
-        case "Paid":
-          return "bg-green-100 text-green-800";
-        case "Processing":
-          return "bg-blue-100 text-blue-800";
-        case "Pending":
-          return "bg-yellow-100 text-yellow-800";
-        case "Failed":
-          return "bg-red-100 text-red-800";
-        case "Refunded":
-          return "bg-purple-100 text-purple-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
-    } else {
-      switch (status) {
-        case "Delivered":
-          return "bg-green-100 text-green-800";
-        case "On The Way":
-          return "bg-blue-100 text-blue-800";
-        case "Dispatched":
-          return "bg-yellow-100 text-yellow-800";
-        case "Order Placed":
-          return "bg-orange-100 text-orange-800";
-        case "Processing":
-          return "bg-purple-100 text-purple-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
+  //This is for handling view order
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setNotes(order.orderNotes || "");
+    setIsModalOpen(true);
+  };
+  //This is for adding the notes
+  const handleAddNote = async () => {
+    if (!selectedOrder) return;
+    await dispatch(addOrderNoteAction(selectedOrder._id, notes));
+    if (!error) {
+      setIsModalOpen(false);
     }
   };
 
+  //This is sending email
+  const sendEmail = async () => {
+    try {
+      setSendingEmail(true);
+      await dispatch(sendOrderNoteEmailAction(selectedOrder._id, notes));
+      alert("Email sent!");
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send email");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className=" max-w-7xl mx-auto space-y-4">
@@ -171,8 +180,8 @@ const OrdersPage = () => {
             </label>
             <input
               type="date"
-              value={formatDate(dateFilter.startDate)}
-              max={formatDate(dateFilter.endDate)}
+              value={formatDates(dateFilter.startDate)}
+              max={formatDates(dateFilter.endDate)}
               onChange={(e) =>
                 setDateFilter((prev) => ({
                   ...prev,
@@ -187,8 +196,8 @@ const OrdersPage = () => {
             <label className="block text-sm font-semibold mb-1">End Date</label>
             <input
               type="date"
-              value={formatDate(dateFilter.endDate)}
-              min={formatDate(dateFilter.startDate)}
+              value={formatDates(dateFilter.endDate)}
+              min={formatDates(dateFilter.startDate)}
               onChange={(e) =>
                 setDateFilter((prev) => ({
                   ...prev,
@@ -211,7 +220,7 @@ const OrdersPage = () => {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>Order List</CardTitle>
+              <CardTitle>Order List({filteredOrders.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border">
@@ -235,6 +244,7 @@ const OrdersPage = () => {
                           <TableHead>CUSTOMER</TableHead>
                           <TableHead>CONTACT</TableHead>
                           <TableHead>TOTAL</TableHead>
+                          <TableHead>ORDER DATE</TableHead>
                           <TableHead>ORDER STATUS</TableHead>
                           <TableHead>PAYMENT STATUS</TableHead>
                           <TableHead className="text-right">ACTIONS</TableHead>
@@ -244,36 +254,34 @@ const OrdersPage = () => {
                         {filteredOrders.map((order, index) => (
                           <TableRow
                             key={order._id}
-                            className="hover:bg-gray-50"
+                            className="hover:bg-gray-100"
                           >
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell className="font-medium">
-                              {order._id.slice(-6)}
+                            <TableCell
+                              className="font-medium text-blue-600 underline hover:cursor-pointer"
+                              onClick={() => handleViewOrder(order)}
+                            >
+                              #{order._id.slice(-6)}
                             </TableCell>
-                            <TableCell>
-                              {order.isGuest
-                                ? order.guestInfo?.firstName ||
-                                  order.guestInfo?.lastName
-                                  ? `${order.guestInfo.firstName || ""} ${
-                                      order.guestInfo.lastName || ""
-                                    }`.trim()
-                                  : order.guestInfo?.email ||
-                                    order.customerName ||
-                                    "Guest"
-                                : order.customerName ||
-                                  order.buyer?.email ||
-                                  order.customerEmail ||
-                                  "Guest"}
-                            </TableCell>
+                            <TableCell>{getCustomerName(order)}</TableCell>
                             <TableCell className="flex flex-col">
-                              <div>{order.customerEmail || "N/A"}</div>
-                              <div>{order.customerPhone || "N/A"}</div>
+                              <div>
+                                {order.guestInfo?.email ||
+                                  order.buyer?.email ||
+                                  "N/A"}
+                              </div>
+                              <div>
+                                {order?.guestInfo?.phoneNumber ||
+                                  order.buyer?.phone ||
+                                  "N/A"}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <span className="font-medium">
                                 $ {order.totalAmount.toFixed(2)}
                               </span>
                             </TableCell>
+                            <TableCell>{formatDate(order.createdAt)}</TableCell>
                             <TableCell>
                               <select
                                 className={`border rounded px-2 py-1 text-sm ${getStatusColor(
@@ -324,17 +332,28 @@ const OrdersPage = () => {
                             </TableCell>
                             <TableCell className="text-right">
                               <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-600 hover:text-red-900"
+                                variant="outline"
+                                title="View Details"
+                                onClick={() => handleViewOrder(order)}
+                                className="text-blue-600  hover:text-blue-900"
                               >
-                                Delete
+                                <Eye className="h-4 w-4" />
                               </Button>
                             </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                    <OrderDetailsDialog
+                      isOpen={isModalOpen}
+                      onOpenChange={setIsModalOpen}
+                      order={selectedOrder}
+                      notes={notes}
+                      setNotes={setNotes}
+                      sendEmail={sendEmail}
+                      sendingEmail={sendingEmail}
+                      addNote={handleAddNote}
+                    />
                   </div>
                 )}
               </div>

@@ -46,6 +46,7 @@ const CreateOrEditUserDialogue = (props) => {
         lName: userData.lName || "",
         email: userData.email || "",
         phone: userData.phone || "",
+        address: userData.address || "",
         role: userData.role || "user",
         status: userData.status || "active",
       });
@@ -91,17 +92,6 @@ const CreateOrEditUserDialogue = (props) => {
     (field) => !userId || field.name !== "password"
   );
 
-  // Separate fields for different layouts
-  const nameFields = formControls.filter(
-    (field) => field.name === "fName" || field.name === "lName"
-  );
-  const optionFields = formControls.filter(
-    (field) => field.name === "role" || field.name === "status"
-  );
-  const otherFields = formControls.filter(
-    (field) => !["fName", "lName", "role", "status"].includes(field.name)
-  );
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -114,33 +104,13 @@ const CreateOrEditUserDialogue = (props) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4">
-          {/* Name fields in same row */}
-          <div className="grid grid-cols-2 gap-4">
-            {nameFields.map((field, index) => (
-              <div key={index}>
-                <FormControl
-                  label={field.label}
-                  handleOnChange={handleOnChange}
-                  inputAttributes={{
-                    type: field.type,
-                    name: field.name,
-                    value: formData[field.name],
-                    placeholder: field.placeholder,
-                    autoComplete: field.autoComplete,
-                    required: !userId || field.name !== "password",
-                    id: field.name,
-                  }}
-                  options={field.options}
-                  className="block w-full rounded-lg border-0"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Other fields (email, phone, password) */}
-          {otherFields.map((field, index) => (
-            <div key={index}>
+        {/* Name fields in same row */}
+        <div className="grid grid-cols-2 gap-4">
+          {formControls.map((field, index) => (
+            <div
+              key={index}
+              className={field.type === "textarea" ? "col-span-full" : ""}
+            >
               <FormControl
                 label={field.label}
                 handleOnChange={handleOnChange}
@@ -158,29 +128,6 @@ const CreateOrEditUserDialogue = (props) => {
               />
             </div>
           ))}
-
-          {/* Role and Status fields in same row */}
-          <div className="grid grid-cols-2 gap-4">
-            {optionFields.map((field, index) => (
-              <div key={index}>
-                <FormControl
-                  label={field.label}
-                  handleOnChange={handleOnChange}
-                  inputAttributes={{
-                    type: field.type,
-                    name: field.name,
-                    value: formData[field.name],
-                    placeholder: field.placeholder,
-                    autoComplete: field.autoComplete,
-                    required: !userId || field.name !== "password",
-                    id: field.name,
-                  }}
-                  options={field.options}
-                  className="block w-full rounded-lg border-0"
-                />
-              </div>
-            ))}
-          </div>
         </div>
 
         <DialogFooter>

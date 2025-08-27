@@ -31,6 +31,13 @@ export const SignUpFormControls = [
     placeholder: "***********",
   },
   {
+    address: "address",
+    name: "address",
+    label: "Address*",
+    type: "textarea",
+    placeholder: "Enter address",
+  },
+  {
     name: "role",
     label: "Role*",
     type: "select",
@@ -234,3 +241,91 @@ export const initialCategoryState = {
   parentId: null,
   showForm: false,
 };
+
+//initial coupon form
+export const initialCouponFormData = {
+  code: "",
+  value: "",
+  expiryDate: "",
+  usageLimit: "",
+};
+
+//coupon form controls
+export const CouponFormControls = [
+  {
+    name: "code",
+    label: "Coupon Code*",
+    type: "text",
+    placeholder: "e.g., SAVE20",
+  },
+
+  {
+    name: "value",
+    label: "Coupon Value*",
+    type: "number",
+    placeholder: "e.g., 20",
+  },
+
+  {
+    name: "expiryDate",
+    label: "Expiry Date*",
+    type: "date",
+    placeholder: "Enter  expiry date",
+  },
+  {
+    name: "usageLimit",
+    label: "Usage Limit*",
+    type: "number",
+    placeholder: "e.g., 100",
+  },
+];
+
+export const personalInfoFields = [
+  {
+    label: "First Name",
+    name: "fName",
+    type: "text",
+    placeholder: "Enter your first name",
+  },
+  {
+    label: "Last Name",
+    name: "lName",
+    type: "text",
+    placeholder: "Enter your last name",
+  },
+  {
+    label: "Email Address",
+    name: "email",
+    type: "email",
+    placeholder: "Enter your email",
+  },
+  {
+    label: "Phone Number",
+    name: "phone",
+    type: "tel",
+    placeholder: "Enter your phone number",
+  },
+  {
+    label: "Address",
+    name: "address",
+    type: "textarea",
+    placeholder: "Enter your full address",
+  },
+];
+
+export const passwordFields = [
+  {
+    label: "New Password",
+    name: "password",
+    type: "password",
+    placeholder: "Enter new password",
+    isPassword: true,
+  },
+  {
+    label: "Confirm Password",
+    name: "confirmPassword",
+    type: "password",
+    placeholder: "Confirm new password",
+    isPassword: true,
+  },
+];

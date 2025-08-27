@@ -294,7 +294,7 @@ const UsersPage = () => {
                             {/* View button */}
                             <Button
                               className="text-blue-600  hover:text-blue-900"
-                              variant="ghost"
+                              variant="outline"
                               title="View Details"
                               onClick={() => handleViewUser(user)}
                             >
@@ -303,7 +303,7 @@ const UsersPage = () => {
                             {/* edit button */}
                             <Button
                               className="text-green-600  hover:text-green-900"
-                              variant="ghost"
+                              variant="outline"
                               title="Edit User"
                               onClick={() => handleEditUser(user)}
                             >
