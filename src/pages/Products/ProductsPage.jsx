@@ -72,7 +72,7 @@ const ProductsPage = () => {
   // Filter Products based on search input
   const filteredProducts = (products || []).filter((product) => {
     const matchesSearch = product.title
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesBrand = brandFilter === "all" || product.brand === brandFilter;
     const matchesStatus =

@@ -127,9 +127,9 @@ const AdminReviewPage = () => {
     .filter((review) => {
       const matchesSearch =
         review.productId?.title
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        review.userId.name.toLowerCase().includes(searchTerm.toLowerCase());
+        review?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus =
         statusFilter === "all" || review.status === statusFilter;
       const matchesRating =
