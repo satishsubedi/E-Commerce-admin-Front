@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize with proper error handling
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-
+console.log(genAI);
 export const generateAIDescription = async (productDetails) => {
   try {
     // Validate input
