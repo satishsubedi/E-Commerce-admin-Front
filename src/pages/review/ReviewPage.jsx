@@ -41,6 +41,7 @@ import PageLoadingSpinner from "../../components/helper/PageLoadingSpinner";
 
 const AdminReviewPage = () => {
   const [reviews, setReviews] = useState([]);
+  console.log(reviews);
   const { isLoading, startLoading, stopLoading } = useLoading(); //loading from custom hook
 
   const [selectedReview, setSelectedReview] = useState(null);
@@ -123,18 +124,18 @@ const AdminReviewPage = () => {
   };
 
   // Filter and sort reviews based on search, status, rating, and sort order
-  const filteredReviews = reviews
-    .filter((review) => {
+  const filteredReviews = (reviews || [])
+    ?.filter((review) => {
       const matchesSearch =
-        review.productId?.title
+        review?.productId?.title
           ?.toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        review?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+          .includes(searchTerm?.toLowerCase()) ||
+        review?.userId?.name?.toLowerCase().includes(searchTerm?.toLowerCase());
       const matchesStatus =
-        statusFilter === "all" || review.status === statusFilter;
+        statusFilter === "all" || review?.status === statusFilter;
       const matchesRating =
-        ratingFilter === "all" || review.rating.toString() === ratingFilter;
-
+        ratingFilter === "all" || review?.rating?.toString() === ratingFilter;
+      // return matchesSearch;
       return matchesSearch && matchesStatus && matchesRating;
     })
     .sort((a, b) => {
@@ -267,13 +268,13 @@ const AdminReviewPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredReviews.map((review) => (
+                      {filteredReviews?.map((review) => (
                         <TableRow key={review._id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <img
                                 src={
-                                  review.productId.thumbnail ||
+                                  review?.productId.thumbnail ||
                                   "/placeholder.svg"
                                 }
                                 alt={review.productId.title}
